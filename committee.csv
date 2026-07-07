@@ -1,0 +1,8 @@
+"Key","Value","Type","Description"
+"Festival Name","","string","The main title"
+"Festival Year","","number","Current year"
+"Countdown Date","","datetime","When does the festival start"
+"Primary Color","","string","Brand primary (hex)"
+"Enable Walkathon","TRUE","boolean","Toggle walkathon module"
+"Enable Badminton","TRUE","boolean","Toggle badminton module"
+"Enable Gallery","TRUE","boolean","Toggle photo gallery"

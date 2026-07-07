@@ -1,0 +1,1238 @@
+
+
+================================================================================
+FILE: Project_Mahabali_Master_Blueprint_v1.docx
+================================================================================
+
+Project Mahabali
+GR Sitara Onam Festival Platform
+Master Product Requirements & AI Development Blueprint
+Version 1.0
+Prepared for Antigravity Plan Mode + Gemini
+
+This document is the authoritative vision and engineering blueprint for building a premium, reusable Onam festival platform.
+
+## 1. Executive Vision
+  - Build a festival experience, not a website.
+  - Apple-quality interaction design with Kerala aesthetics and Disney-inspired storytelling.
+  - Mobile-first while delivering a premium desktop experience.
+  - Reusable every year by changing configuration instead of code.
+
+## 2. Design Constitution
+  - Festival before information.
+  - Maveli is the host, not a mascot.
+  - Every animation has purpose.
+  - Performance is a feature.
+  - Everything must be configurable.
+  - Accessibility and responsiveness are mandatory.
+
+## 3. Experience Journey
+  - 5-second cinematic intro with skip.
+  - Story-driven scrolling through the festival grounds.
+  - Stacked-card layout where previous sections collapse into elegant slices.
+  - Dynamic transformation from countdown mode to Festival Live mode.
+
+## 4. Core Experiences
+  - Hero + Countdown
+  - Today's Highlights
+  - Activities
+  - Walkathon
+  - Badminton Tournament
+  - Cultural Events
+  - Sponsors
+  - Food Stalls
+  - Gallery
+  - Announcements
+  - Committee
+  - Archive
+
+## 5. Dynamic Maveli
+  - Welcome animation
+  - Walkathon guide
+  - Badminton player
+  - Cultural performer
+  - Sadhya host
+  - Prize presenter
+  - Embedded 10-second videos
+
+## 6. Google Sheets CMS
+  - Events
+  - Sponsors
+  - Stalls
+  - Registrations
+  - Walkathon
+  - Badminton
+  - Announcements
+  - Gallery
+  - Countdown
+  - Committee
+  - FAQ
+  - Emergency Contacts
+  - Feature Flags
+  - Theme Configuration
+
+## 7. Technical Architecture
+  - Next.js + TypeScript
+  - React
+  - Tailwind CSS
+  - Framer Motion
+  - GSAP
+  - React Three Fiber only where valuable
+  - Google Sheets API
+  - Google Drive Gallery
+  - PWA
+  - Push Notifications
+  - GitHub
+  - Cloudflare Pages
+  - Custom Domain: onam.grsitara.in
+
+## 8. Motion & Lighting
+  - Apple Vision inspired depth
+  - Soft volumetric lighting
+  - Realistic shadows
+  - Kerala sunrise palette
+  - Floating petals
+  - Lamp flicker
+  - Subtle parallax
+  - No excessive animations
+
+## 9. Interactive Modules
+  - World Cup style badminton bracket
+  - Walkathon tracker with top 5/daily/final winners
+  - Announcement ribbon
+  - Interactive Pookalam
+  - Floating Nilavilakku
+  - Sponsor pavilion
+  - Food street
+  - Easter eggs
+
+## 10. Performance Requirements
+  - Lighthouse >95
+  - Lazy loading
+  - Adaptive animation quality
+  - Offline support
+  - Accessibility WCAG AA
+  - SEO
+  - Fast mobile rendering
+
+## 11. Administration
+  - Hidden admin guide
+  - No hardcoded data
+  - Google Sheets driven
+  - Google Drive gallery
+  - Reusable yearly
+
+## 12. Plan Mode Execution
+  - Phase 0 - Discovery and validation
+  - Phase 1 - Design system
+  - Phase 2 - Technical architecture
+  - Phase 3 - Core experience
+  - Phase 4 - Dynamic modules
+  - Phase 5 - Polish
+  - Phase 6 - Deployment
+  - Pause after every phase for review.
+
+## 13. Deliverables
+  - Architecture diagrams
+  - Design system
+  - Component library
+  - Google Sheets schema
+  - Implementation tasks
+  - Deployment guide
+  - Acceptance checklist
+  - Admin manual
+
+## 14. Acceptance Criteria
+  - Feels handcrafted rather than AI-generated.
+  - Runs smoothly on modern mobile devices.
+  - Professional visual quality.
+  - Future committees can operate without coding.
+
+## Detailed Instructions to Antigravity
+Operate exclusively in Plan Mode. Do not generate production code immediately. First produce an implementation plan, identify ambiguities, propose architecture, break work into independently reviewable milestones, and wait for approval before each phase. Prefer maintainability over cleverness. Generate production-grade code only after design approval.
+
+## Future Volumes
+  - Volume 2 - UX & Visual Design Bible
+  - Volume 3 - Technical Architecture
+  - Volume 4 - Motion & Animation Bible
+  - Volume 5 - Google Sheets CMS Specification
+  - Volume 6 - Component Library
+  - Volume 7 - Sprint Backlog & Task Breakdown
+  - Volume 8 - Deployment & Operations Guide
+
+## Author Note
+This document intentionally acts as the single source of truth for Project Mahabali. It should guide AI coding agents and human developers alike, ensuring that every future edition of the GR Sitara Onam platform retains a consistent level of quality and vision.
+
+================================================================================
+FILE: Project_Mahabali_Volume_01_Vision_Product_Requirements_v2.docx
+================================================================================
+
+Project Mahabali
+Volume 01
+Vision & Product Requirements (PRD)
+Version 2.0
+Authoritative Product Requirements Document for the GR Sitara Onam Festival Platform.
+This document defines WHAT to build and WHY it should exist.
+
+## 1. Executive Vision
+  - Build an unforgettable digital Onam celebration rather than a traditional event website.
+  - Blend Apple-quality product design, Kerala culture and Disney-style storytelling.
+  - Create a platform reusable every year through configuration, not code.
+  - Deliver an experience that residents proudly share.
+
+## 2. Project Goals
+  - Single destination for all festival information.
+  - Centralize registrations, schedules, leaderboards and announcements.
+  - Provide immersive storytelling while remaining easy to use.
+  - Allow organizers to manage content entirely from Google Sheets.
+
+## 3. Success Metrics
+  - Loads in under 2 seconds on modern mobile devices.
+  - Lighthouse score above 95.
+  - Zero code changes required for yearly content updates.
+  - Positive resident engagement and repeat visits.
+
+## 4. Design Constitution
+  - Festival before information.
+  - Maveli is the host, not a mascot.
+  - Motion communicates purpose.
+  - Mobile-first, desktop-enhanced.
+  - Performance is a feature.
+  - Accessibility is mandatory.
+  - Everything is configurable.
+
+## 5. User Personas
+
+[TABLE]
+  Persona || Primary Goal
+  Residents || Discover events, register and follow competitions.
+  Children || Enjoy playful interactions and animations.
+  Organizers || Manage content without technical knowledge.
+  Sponsors || Receive premium visibility.
+  Visitors || Understand the festival quickly.
+[/TABLE]
+
+## 6. Functional Requirements
+  - 5-second cinematic intro with skip.
+  - Countdown timer.
+  - Story-driven stacked-card scrolling.
+  - Activity registrations using QR codes.
+  - Walkathon leaderboard.
+  - World Cup-style badminton bracket.
+  - Sponsors and food stalls.
+  - Announcements.
+  - Gallery from Google Drive.
+  - Push notifications.
+  - PWA support.
+
+## 7. Non-Functional Requirements
+  - Responsive across mobile, tablet and desktop.
+  - WCAG AA accessibility.
+  - SEO friendly.
+  - Offline capable.
+  - Secure, maintainable and scalable.
+  - Future-proof architecture.
+
+## 8. Assumptions
+  - Google Sheets remains the CMS.
+  - Google Drive hosts gallery assets.
+  - Cloudflare Pages hosts the site.
+  - GitHub stores source code.
+
+## 9. Risks
+  - Large media assets impacting performance.
+  - Google Sheets availability.
+  - Animation complexity.
+  - Late content changes before the event.
+
+## 10. Roadmap
+  - Phase 1: Festival platform.
+  - Phase 2: AI Maveli assistant.
+  - Phase 3: Multi-festival support.
+  - Phase 4: Analytics and gamification.
+
+## 11. Acceptance Criteria
+  - Professional visual quality.
+  - Handcrafted feel.
+  - Simple organizer workflow.
+  - Reusable next year.
+  - Ready for production deployment.
+
+## 12. Relationship to Remaining Volumes
+  - Volume 02 – UX & Information Architecture
+  - Volume 03 – Visual Design Bible
+  - Volume 04 – Motion & Animation Bible
+  - Volume 05 – Component Library
+  - Volume 06 – Google Sheets CMS & Data Model
+  - Volume 07 – Technical Architecture
+  - Volume 08 – Antigravity Execution Guide
+
+================================================================================
+FILE: Project_Mahabali_Volume_02_UX_Information_Architecture.docx
+================================================================================
+
+Project Mahabali
+Volume 02
+UX & Information Architecture
+Version 1.0
+This document defines the complete user experience, navigation, storytelling and information architecture for the GR Sitara Onam Festival Platform.
+
+## 1. UX Principles
+  - Mobile-first, desktop-enhanced.
+  - Every interaction should spark delight.
+  - Motion communicates meaning, never decoration.
+  - Festival atmosphere always takes precedence over information density.
+  - All content must remain discoverable within three taps.
+
+## 2. Visitor Journey
+  - Open onam.grsitara.in
+  - 5-second cinematic intro with Skip button.
+  - Hero section with countdown and primary CTAs.
+  - Explore today's festival highlights.
+  - Discover activities through stacked scrolling cards.
+  - Register using QR codes.
+  - Follow live competitions.
+  - Browse gallery and memories.
+  - Leave with festival highlights and gratitude.
+
+## 3. Navigation Model
+  - Single-page immersive experience.
+  - Sticky translucent navigation.
+  - Stacked-card scrolling where completed sections collapse into slim headers.
+  - Quick-jump menu to major sections.
+  - Persistent floating Nilavilakku returns user to top.
+
+## 4. Information Architecture
+  - Hero
+  - Today's Highlights
+  - Countdown
+  - Activities
+  - Walkathon
+  - Badminton
+  - Culturals
+  - Sadhya
+  - Sponsors
+  - Food Stalls
+  - Announcements
+  - Gallery
+  - Committee
+  - FAQ
+  - Contact
+  - Footer
+
+## 5. Section Specifications
+
+### Hero
+Cinematic welcome, countdown, register buttons, Maveli greeting.
+
+### Activities
+Interactive activity cards with status and registration.
+
+### Walkathon
+Top 5, daily winners, route tracker, QR registration.
+
+### Badminton
+Fixtures, knockout bracket, live progress, winners.
+
+### Sponsors
+Premium sponsor pavilion with logos.
+
+### Food Stalls
+Festival street showcasing stalls separately from sponsors.
+
+### Gallery
+Google Drive powered curated memories.
+
+### Announcements
+Temple notice-board inspired ticker.
+
+## 6. Storytelling Flow
+  - Entrance Gate
+  - Festival Awakens
+  - Meet Maveli
+  - Join the Celebrations
+  - Compete
+  - Celebrate Winners
+  - Relive Memories
+  - Thank You & See You Next Year
+
+## 7. Responsive Behaviour
+  - Desktop: cinematic layouts and richer parallax.
+  - Tablet: simplified depth with identical functionality.
+  - Mobile: prioritize readability, touch ergonomics and performance.
+  - Adaptive animation quality based on device capability.
+
+## 8. Accessibility
+  - Keyboard accessible.
+  - Screen-reader friendly.
+  - Reduced-motion mode.
+  - High color contrast.
+  - Large touch targets.
+
+## 9. Wireframe Outline
+  - Hero -> Countdown -> Highlights -> Activities -> Walkathon -> Badminton -> Culturals -> Sponsors -> Stalls -> Gallery -> Announcements -> Footer
+
+## 10. UX Acceptance Criteria
+  - Users reach any major section in under 10 seconds.
+  - Registration QR codes always visible within their activity.
+  - Animations never reduce usability.
+  - Entire experience remains smooth on modern smartphones.
+
+## Appendix - Inputs Required Later
+  - Apartment branding assets
+  - Final sponsor logos
+  - Final stall list
+  - Google Sheet IDs
+  - Google Drive folder
+  - Maveli video assets
+  - Final event schedule
+
+================================================================================
+FILE: Project_Mahabali_Volume_03_Visual_Design_Bible.docx
+================================================================================
+
+Project Mahabali
+Volume 03
+Visual Design Bible
+Version 1.0
+The definitive visual identity specification for the GR Sitara Onam Festival Platform.
+
+## 1. Design Philosophy
+  - Apple simplicity with Kerala soul.
+  - Disney-quality storytelling through visuals.
+  - Premium over flashy.
+  - Every pixel should reinforce celebration.
+  - Elegant realism rather than cartoon aesthetics.
+
+## 2. Creative Inspiration
+  - Apple.com product launches.
+  - Apple Vision Pro website motion.
+  - Kerala Tourism branding.
+  - Traditional Kerala architecture.
+  - Temple festivals.
+  - Pixar environmental storytelling.
+  - Premium game landing pages.
+
+## 3. Colour System
+
+[TABLE]
+  Token || Usage
+  Temple Gold || #D4AF37
+  Onam Orange || #E67E22
+  Banana Leaf Green || #2E8B57
+  Warm Ivory || #F8F3E7
+  Deep Brown || #4A2E1F
+  Sunrise Gradient || Orange → Gold → Ivory
+  Festival Accent || Maroon + Gold
+[/TABLE]
+
+## 4. Typography
+  - Headings: Elegant serif with premium editorial feel.
+  - Body: Inter / SF Pro equivalent.
+  - Malayalam: Rounded, highly readable.
+  - Large typography with generous whitespace.
+  - No decorative fonts except festival headings.
+
+## 5. Lighting
+  - Golden hour lighting.
+  - Soft volumetric sunlight.
+  - Warm lamp glow.
+  - Subtle bloom only.
+  - Natural reflections.
+  - Never oversaturated.
+
+## 6. Material System
+  - Glassmorphism for floating panels.
+  - Polished wood textures.
+  - Brass accents.
+  - Stone-inspired surfaces.
+  - Handcrafted Kerala detailing.
+
+## 7. Motion Language
+  - Apple-style easing.
+  - 60fps target.
+  - Smooth inertia scrolling.
+  - Soft fades instead of abrupt transitions.
+  - Cards gently lift on hover.
+  - Parallax limited to 10-20px.
+  - Micro animations under 300ms.
+
+## 8. Maveli Art Direction
+  - Friendly royal host.
+  - High-quality 3D appearance.
+  - Consistent proportions.
+  - Warm smile.
+  - Natural cloth simulation.
+  - Activity-specific costumes and props.
+  - Never appears static.
+
+## 9. Environment
+  - Kerala village inspiration.
+  - Traditional entrance gate.
+  - Banana trees.
+  - Flower petals.
+  - Nilavilakku.
+  - Temple bells.
+  - Pookalam.
+  - Decorative umbrellas.
+  - Soft ambient particles.
+
+## 10. Component Styling
+  - Rounded cards.
+  - Floating shadows.
+  - Large imagery.
+  - Minimal borders.
+  - Soft gradients.
+  - Premium iconography.
+  - Consistent spacing using 8px grid.
+
+## 11. Responsive Visual Rules
+  - Desktop receives enhanced depth.
+  - Tablet simplifies effects.
+  - Mobile prioritizes clarity and frame rate.
+  - No horizontal scrolling.
+
+## 12. Animation Do's
+  - Motion must guide attention.
+  - Respect reduced-motion settings.
+  - Prioritize subtle elegance.
+  - Animations should reinforce storytelling.
+
+## 13. Animation Don'ts
+  - No spinning logos.
+  - No excessive particle storms.
+  - No flashing effects.
+  - No random floating objects.
+  - No unnecessary 3D.
+
+## 14. Visual Acceptance Criteria
+  - Looks handcrafted rather than AI-generated.
+  - Feels comparable to premium product websites.
+  - Immediately communicates celebration.
+  - Consistent visual language across every section.
+
+## Appendix - Assets Required
+  - Apartment logo
+  - Maveli videos
+  - Sponsor logos
+  - Food stall branding
+  - Gallery photographs
+  - Festival icons
+  - Traditional textures
+  - Ambient audio (optional)
+
+================================================================================
+FILE: Project_Mahabali_Volume_04_Motion_Animation_Bible.docx
+================================================================================
+
+Project Mahabali
+Volume 04
+Motion & Animation Bible
+Version 1.0
+Defines every motion principle, cinematic transition and animation guideline for the GR Sitara Onam Festival Platform.
+
+## 1. Motion Philosophy
+  - Motion exists to tell the festival story.
+  - Every animation must have a purpose.
+  - Elegant, premium and cinematic over flashy.
+  - Maintain 60fps whenever possible.
+  - Respect prefers-reduced-motion settings.
+
+## 2. Cinematic Opening (5 Seconds)
+  - 0-1s: Kerala dawn with subtle mist and birds.
+  - 1-2s: GR Sitara fades into view with warm sunrise.
+  - 2-3s: Nilavilakku lights automatically.
+  - 3-4s: Maveli walks in, smiles and welcomes visitors.
+  - 4-5s: Countdown appears, Skip button always visible, seamless transition into homepage.
+
+## 3. Scroll Choreography
+  - Stacked-card transitions with depth.
+  - Completed sections collapse into slim headers.
+  - Foreground moves slightly faster than background.
+  - Cards gently scale and elevate when active.
+  - Transitions should feel continuous rather than page changes.
+
+## 4. Scene-by-Scene Motion
+
+### Hero
+Floating petals, ambient light rays, subtle camera drift.
+
+### Highlights
+Cards rise sequentially with staggered timing.
+
+### Walkathon
+Animated route with moving participant markers and walking Maveli.
+
+### Badminton
+Bracket branches animate as winners advance.
+
+### Culturals
+Dancing Maveli, rhythmic decorative motion.
+
+### Sponsors
+Decorated stalls slide gently into view.
+
+### Gallery
+Photo masonry with soft zoom and fade.
+
+### Footer
+Thank-you scene with glowing lamps.
+
+## 5. Maveli Animation States
+  - Idle breathing and blinking.
+  - Walking.
+  - Waving.
+  - Playing badminton.
+  - Dancing.
+  - Presenting trophies.
+  - Inviting guests to Sadhya.
+  - Celebrating winners.
+
+## 6. Environmental Effects
+  - Flower petals.
+  - Floating dust particles.
+  - Soft god rays.
+  - Lamp flame flicker.
+  - Banana leaf sway.
+  - Fabric movement.
+  - Occasional birds.
+  - Subtle confetti during celebrations.
+
+## 7. Camera Language
+  - No sudden camera movement.
+  - Very slow parallax drift.
+  - Depth through layered movement.
+  - Focus transitions via blur and scale.
+  - Never rotate the camera unexpectedly.
+
+## 8. Animation Timing
+
+[TABLE]
+  Interaction || Duration
+  Hover || 150-200 ms
+  Button Press || 120 ms
+  Card Expand || 300 ms
+  Section Transition || 600-800 ms
+  Intro || 5 s
+  Page Fade || 250 ms
+[/TABLE]
+
+## 9. Performance Budgets
+  - Limit concurrent particle systems.
+  - Pause off-screen animations.
+  - Lazy load videos and 3D assets.
+  - Reduce effects on lower-end devices.
+  - Use CSS transforms over layout changes.
+
+## 10. Audio
+  - No autoplay music.
+  - Optional ambience toggle.
+  - Soft temple bells during intro.
+  - Very subtle interaction sounds only.
+
+## 11. Easter Eggs
+  - Tap Nilavilakku to brighten flame.
+  - Tap Maveli multiple times for surprise greeting.
+  - Complete Pookalam through scrolling.
+  - Festival Live mode enables fireworks after countdown reaches zero.
+
+## 12. Animation Acceptance Criteria
+  - Animations never block interaction.
+  - Smooth on modern mobile devices.
+  - Visual consistency across all sections.
+  - Users feel guided through a continuous festival story.
+
+================================================================================
+FILE: Project_Mahabali_Volume_05_Component_Library.docx
+================================================================================
+
+Project Mahabali
+Volume 05
+Component Library & Design System
+Version 1.0
+Defines every reusable UI component, its behaviour, data source, animations and acceptance criteria.
+
+### Hero Banner
+  - Purpose: Reusable application component.
+  - Cinematic welcome
+  - Countdown
+  - Primary CTAs
+  - Responsive
+  - Google Sheets driven
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Navigation Bar
+  - Purpose: Reusable application component.
+  - Sticky
+  - Glassmorphism
+  - Quick jump
+  - Mobile drawer
+  - Scroll aware
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Stacked Section Card
+  - Purpose: Reusable application component.
+  - Expandable
+  - Collapsed state
+  - Animated transitions
+  - Lazy loaded
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Activity Card
+  - Purpose: Reusable application component.
+  - Image
+  - Description
+  - QR
+  - Status badge
+  - Registration button
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Walkathon Leaderboard
+  - Purpose: Reusable application component.
+  - Top 5
+  - Daily winners
+  - Final winners
+  - Auto refresh
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Badminton Bracket
+  - Purpose: Reusable application component.
+  - Fixtures
+  - Knockout tree
+  - Live winners
+  - Champion card
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Sponsor Card
+  - Purpose: Reusable application component.
+  - Logo
+  - Banner
+  - Link
+  - Premium hover
+  - Analytics ready
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Food Stall Card
+  - Purpose: Reusable application component.
+  - Menu
+  - Location
+  - Image
+  - Opening status
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Announcement Ribbon
+  - Purpose: Reusable application component.
+  - Live updates
+  - Priority levels
+  - Auto scroll
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Gallery Card
+  - Purpose: Reusable application component.
+  - Google Drive
+  - Lazy images
+  - Lightbox
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Countdown Widget
+  - Purpose: Reusable application component.
+  - Configurable
+  - Festival live mode
+  - Auto switch
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### QR Registration Panel
+  - Purpose: Reusable application component.
+  - Multiple registrations
+  - Dynamic sheets
+  - QR image
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Floating Nilavilakku
+  - Purpose: Reusable application component.
+  - Back to top
+  - Glow animation
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Maveli Widget
+  - Purpose: Reusable application component.
+  - Context aware
+  - Video
+  - Animations
+  - Speech bubbles
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+### Footer
+  - Purpose: Reusable application component.
+  - Contacts
+  - Committee
+  - Social links
+  - Credits
+  - Accessibility: Keyboard and screen-reader compatible.
+  - Responsive: Desktop, tablet and mobile.
+  - Animation: Defined in Volume 04.
+  - Acceptance: Production quality.
+
+## Shared Component Standards
+  - 8px spacing grid.
+  - Rounded corners.
+  - Soft shadows.
+  - Glassmorphism where appropriate.
+  - Lazy loading by default.
+  - Skeleton loading states.
+  - Error states for all dynamic content.
+  - Empty state illustrations.
+  - Dark overlays for readability.
+
+## Design Tokens
+
+[TABLE]
+  Token || Description
+  Spacing || 8px scale
+  Border Radius || Large rounded
+  Elevation || 5 shadow levels
+  Typography || Volume 03
+  Motion || Volume 04
+  Colors || Volume 03
+  Icons || Outlined premium style
+  Transitions || Framer Motion
+[/TABLE]
+
+## Component Lifecycle
+  - Loading
+  - Loaded
+  - Refreshing
+  - Empty
+  - Error
+  - Offline
+
+## Google Sheets Mapping
+  - Activities -> Activity Cards
+  - Walkathon -> Leaderboard
+  - Badminton -> Tournament
+  - Sponsors -> Sponsor Cards
+  - Stalls -> Stall Cards
+  - Announcements -> Ribbon
+  - Gallery -> Photo Grid
+  - Countdown -> Hero Widget
+
+## Acceptance Criteria
+  - All components reusable.
+  - No duplicated UI.
+  - Configurable through CMS.
+  - Animation consistency.
+  - Accessibility compliant.
+  - Optimized for performance.
+
+================================================================================
+FILE: Project_Mahabali_Volume_06_Google_Sheets_CMS_Data_Model.docx
+================================================================================
+
+Project Mahabali
+Volume 06
+Google Sheets CMS & Data Model
+Version 1.0
+Defines the complete content management system powered by Google Sheets. The objective is to ensure organizers never need to modify code to update festival content.
+
+## 1. CMS Philosophy
+  - Google Sheets is the single source of truth.
+  - Every user-visible piece of content should be configurable.
+  - No hardcoded festival data.
+  - Support yearly reuse through configuration changes.
+
+## 2. Workbook Structure
+
+[TABLE]
+  Sheet || Purpose
+  Configuration || Festival metadata, colors, year, countdown dates.
+  Events || Master event schedule.
+  Activities || Activity cards and registrations.
+  Walkathon || Leaderboard, daily winners, final winners.
+  Badminton || Fixtures, knockout rounds, winners.
+  Sponsors || Logo, category, website, banner.
+  FoodStalls || Food vendors, menus, timings.
+  Announcements || Priority messages and ribbons.
+  Gallery || Google Drive image/video references.
+  Committee || Committee members and contacts.
+  FAQs || Frequently asked questions.
+  Notifications || Push notification queue.
+  FeatureFlags || Enable/disable modules.
+  Theme || Colors, logos, branding assets.
+[/TABLE]
+
+## 3. Common Columns
+  - Id
+  - Title
+  - Description
+  - Status
+  - Display Order
+  - Start Date
+  - End Date
+  - Image URL
+  - QR Code URL
+  - Active
+  - Last Updated
+
+## 4. Data Refresh Strategy
+  - Refresh on page load.
+  - Manual refresh button.
+  - Automatic polling every 60 seconds for live events.
+  - Graceful fallback if Sheets unavailable.
+  - Cache locally for offline support.
+
+## 5. Validation Rules
+  - Mandatory IDs.
+  - No duplicate records.
+  - Display order must be unique.
+  - Only valid image URLs.
+  - QR codes mandatory for registration-enabled events.
+  - Feature flags must be boolean.
+
+## 6. Gallery Integration
+  - Google Drive folder as source.
+  - Folder IDs configurable.
+  - Only organizer uploads.
+  - Lazy image loading.
+  - Automatic lightbox generation.
+
+## 7. Push Notifications
+  - Notification title.
+  - Body.
+  - Priority.
+  - Target audience.
+  - Schedule.
+  - Expiry.
+  - Delivered flag.
+
+## 8. Configuration Sheet
+  - Festival Name
+  - Festival Year
+  - Apartment Name
+  - Countdown Date
+  - Primary Color
+  - Secondary Color
+  - Logo
+  - Maveli Asset Pack
+  - Intro Enabled
+  - Festival Live Date
+
+## 9. Feature Flags
+  - Enable Walkathon
+  - Enable Badminton
+  - Enable Gallery
+  - Enable AI Assistant
+  - Enable Fireworks
+  - Enable Easter Eggs
+  - Enable Push Notifications
+
+## 10. Error Handling
+  - Missing sheet.
+  - Missing columns.
+  - Invalid data.
+  - Broken image links.
+  - Offline mode.
+  - Graceful placeholder components.
+
+## 11. Acceptance Criteria
+  - Committee updates data without code changes.
+  - Entire festival configurable from Sheets.
+  - Updates reflected after refresh.
+  - Future years require only configuration updates.
+
+================================================================================
+FILE: Project_Mahabali_Volume_07_Technical_Architecture_Engineering_Blueprint.docx
+================================================================================
+
+Project Mahabali
+Volume 07
+Technical Architecture & Engineering Blueprint
+Version 1.0
+Defines the production architecture, technology stack, deployment model, integration strategy and engineering standards.
+
+## 1. Engineering Principles
+  - Production-ready code only.
+  - Mobile-first architecture.
+  - Configuration over hardcoding.
+  - Reusable festival platform.
+  - Performance and maintainability are first-class requirements.
+
+## 2. Technology Stack
+  - Next.js (App Router)
+  - React + TypeScript
+  - Tailwind CSS
+  - Framer Motion
+  - GSAP
+  - React Three Fiber (only where justified)
+  - Google Sheets API
+  - Google Drive API
+  - PWA support
+  - GitHub Actions
+  - Cloudflare Pages
+
+## 3. High-Level Architecture
+  - Presentation Layer (UI)
+  - Application Layer (Business Logic)
+  - Content Layer (Google Sheets & Drive)
+  - Notification Layer
+  - Caching Layer
+  - Hosting Layer (Cloudflare)
+
+## 4. Suggested Folder Structure
+  - app/
+  - components/
+  - components/ui/
+  - components/sections/
+  - lib/
+  - services/
+  - hooks/
+  - types/
+  - public/
+  - styles/
+  - assets/
+  - config/
+  - data/
+  - utils/
+
+## 5. Core Services
+  - Configuration Service
+  - Google Sheets Service
+  - Gallery Service
+  - Notification Service
+  - Theme Service
+  - Analytics Service
+  - Feature Flag Service
+
+## 6. State Management
+  - React Context for global configuration.
+  - Local component state where appropriate.
+  - Server components for static content.
+  - Client components only for interactivity.
+
+## 7. Data Flow
+  - Load configuration.
+  - Fetch Google Sheets.
+  - Transform into typed models.
+  - Cache responses.
+  - Render reusable components.
+  - Refresh live modules independently.
+
+## 8. Performance Strategy
+  - Image optimization.
+  - Video lazy loading.
+  - Code splitting.
+  - Route prefetching.
+  - Dynamic imports.
+  - Animation budget.
+  - Lighthouse score above 95.
+
+## 9. Security
+  - Read-only public Sheets.
+  - No secrets in frontend.
+  - Environment variables via Cloudflare.
+  - Content validation.
+  - Sanitize external data.
+
+## 10. PWA
+  - Installable application.
+  - Offline shell.
+  - Manifest.
+  - Service worker.
+  - Background refresh.
+  - Push notifications.
+
+## 11. Deployment Pipeline
+  - Developer pushes to GitHub.
+  - GitHub Actions validates build.
+  - Automated linting and type checking.
+  - Cloudflare Pages deployment.
+  - Preview environments for pull requests.
+  - Production deployment on merge.
+
+## 12. Testing Strategy
+  - Unit tests.
+  - Component tests.
+  - Integration tests.
+  - Responsive testing.
+  - Accessibility audits.
+  - Performance audits.
+  - Cross-browser validation.
+
+## 13. Monitoring
+  - Error logging.
+  - Performance metrics.
+  - Page load analytics.
+  - Broken image detection.
+  - Google Sheets health checks.
+
+## 14. Future Architecture
+  - AI Assistant service.
+  - Realtime updates.
+  - Authentication for organizers.
+  - Multi-festival support.
+  - Plugin architecture.
+
+## 15. Definition of Done
+  - Responsive on desktop, tablet and mobile.
+  - All dynamic content sourced from Google Sheets.
+  - Accessible and performant.
+  - Deployable through GitHub and Cloudflare.
+  - Ready for future festival reuse.
+
+================================================================================
+FILE: Project_Mahabali_Volume_08_Antigravity_Plan_Mode_Execution_Guide.docx
+================================================================================
+
+Project Mahabali
+Volume 08
+Antigravity Plan Mode Execution Guide & Delivery Roadmap
+Version 1.0
+This document is the implementation playbook for AI coding agents operating in Plan Mode. It defines how the project must be executed, reviewed and delivered.
+
+## 1. Plan Mode Principles
+  - Never start coding immediately.
+  - Validate all requirements first.
+  - Identify risks and assumptions.
+  - Produce an execution plan before implementation.
+  - Pause after every milestone for approval.
+
+## 2. Overall Delivery Phases
+
+### Phase 0 – Discovery
+Review all eight Project Mahabali volumes and validate requirements.
+
+### Phase 1 – Foundation
+Create design tokens, project structure, routing and shared infrastructure.
+
+### Phase 2 – Design System
+Implement reusable components and visual language.
+
+### Phase 3 – Core Experience
+Hero, intro, navigation, stacked scrolling, countdown and Maveli.
+
+### Phase 4 – Dynamic Modules
+Walkathon, Badminton, Sponsors, Stalls, Gallery and Announcements.
+
+### Phase 5 – Integration
+Google Sheets, Google Drive, notifications and PWA.
+
+### Phase 6 – Polish
+Animations, accessibility, performance and SEO.
+
+### Phase 7 – Deployment
+GitHub, Cloudflare Pages and production verification.
+
+## 3. Deliverables Per Phase
+  - Architecture diagrams
+  - Updated implementation plan
+  - Working demo
+  - Technical decisions
+  - Risk log
+  - Known limitations
+  - Testing evidence
+  - Approval checkpoint
+
+## 4. Task Breakdown Strategy
+  - Break work into features no larger than one review session.
+  - Deliver vertical slices instead of isolated layers.
+  - Every feature must be independently testable.
+  - Avoid parallel implementation of unrelated modules.
+  - Complete foundation before advanced effects.
+
+## 5. Dependency Order
+  - Project setup
+  - Design system
+  - Layout framework
+  - Navigation
+  - CMS integration
+  - Activities
+  - Leaderboards
+  - Gallery
+  - Animations
+  - Notifications
+  - Deployment
+
+## 6. Review Gates
+  - Architecture approval
+  - UI approval
+  - Animation approval
+  - CMS approval
+  - Performance approval
+  - Production readiness approval
+
+## 7. Risk Register
+  - Animation performance on mobile.
+  - Google Sheets rate limits.
+  - Large media assets.
+  - Browser compatibility.
+  - Future maintainability.
+  - Content quality.
+
+## 8. Definition of Done
+  - Responsive across major devices.
+  - Lighthouse score above 95.
+  - Accessibility checks pass.
+  - All data configurable.
+  - No blocking console errors.
+  - Production deployment successful.
+
+## 9. Handover Package
+  - Source code
+  - Deployment guide
+  - Admin guide
+  - Google Sheets template
+  - Google Drive setup
+  - Architecture documentation
+  - Release notes
+
+## 10. Future Enhancements
+  - AI-powered Maveli assistant.
+  - Realtime live scores.
+  - Digital certificates.
+  - Multi-language support.
+  - Reusable festival templates.
+  - Analytics dashboard.
+
+## 11. Final Instructions to Antigravity
+Treat Project Mahabali as a premium software product rather than a one-off website. Follow the previous seven volumes as mandatory specifications. Execute work incrementally, maintain architectural consistency, optimise continuously for performance, and seek approval after every major milestone. The end product must feel handcrafted, cinematic, mobile-first, highly maintainable, and reusable for future GR Sitara Onam festivals.

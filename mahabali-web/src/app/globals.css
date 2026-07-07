@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* ─── Spec-exact colour tokens (Volume 03) ─── */
+  --color-temple-gold:    #D4AF37;
+  --color-onam-orange:    #E67E22;
+  --color-banana-green:   #2E8B57;
+  --color-warm-ivory:     #F8F3E7;
+  --color-deep-brown:     #4A2E1F;
+  --color-maroon:         #7B1C1C;
+
+  /* Legacy aliases so existing components don't break */
+  --color-brand-primary:    #D4AF37;
+  --color-brand-secondary:  #E67E22;
+  --color-brand-accent:     #D4AF37;
+  --color-festival-red:     #7B1C1C;
+  --color-festival-green:   #2E8B57;
+  --color-festival-wood:    #5D4037;
+  --color-festival-brass:   #D4AF37;
+  --color-festival-leaf:    #81C784;
+
+  --font-sans:   'Inter', Arial, sans-serif;
+  --font-serif:  'Playfair Display', Georgia, serif;
+}
+
+:root {
+  --background:  #F8F3E7;
+  --foreground:  #4A2E1F;
+  --surface:     rgba(255, 251, 240, 0.85);
+
+  /* Elevation shadows — 5 levels */
+  --shadow-1: 0 1px 3px rgba(74,46,31,0.08), 0 1px 2px rgba(74,46,31,0.06);
+  --shadow-2: 0 4px 6px rgba(74,46,31,0.07), 0 2px 4px rgba(74,46,31,0.06);
+  --shadow-3: 0 10px 15px rgba(74,46,31,0.08), 0 4px 6px rgba(74,46,31,0.05);
+  --shadow-4: 0 20px 25px rgba(74,46,31,0.09), 0 10px 10px rgba(74,46,31,0.04);
+  --shadow-5: 0 40px 50px rgba(74,46,31,0.12), 0 20px 20px rgba(74,46,31,0.06);
+
+  /* Gradients */
+  --gradient-sunrise: linear-gradient(180deg, #F8F3E7 0%, #F5E6C0 30%, #E8A44A 65%, #C0621A 100%);
+  --gradient-gold:    linear-gradient(135deg, #D4AF37 0%, #F0C84B 50%, #B8971F 100%);
+  --gradient-hero-overlay: linear-gradient(180deg, rgba(74,46,31,0.1) 0%, rgba(74,46,31,0.55) 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1E0F08;
+    --foreground: #F8F3E7;
+    --surface:    rgba(40, 20, 10, 0.85);
+  }
+}
+
+/* ─── Base ─── */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Festival heading serif style */
+.font-festival {
+  font-family: var(--font-serif);
+}
+
+h1, .heading-serif {
+  font-family: var(--font-serif);
+}
+
+/* ─── Glassmorphism utilities ─── */
+.glass {
+  background: rgba(255, 251, 240, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.glass-dark {
+  background: rgba(30, 15, 5, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+/* ─── Gold shimmer animation ─── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(90deg, #D4AF37, #F0C84B, #D4AF37, #B8971F, #D4AF37);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ─── Marquee animation ─── */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+/* ─── Petal float ─── */
+@keyframes petalFloat {
+  0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(-110vh) rotate(360deg) translateX(60px); opacity: 0; }
+}
+.petal {
+  animation: petalFloat linear infinite;
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ─── Lamp flicker ─── */
+@keyframes flicker {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  20%       { opacity: 0.85; transform: scale(0.97); }
+  40%       { opacity: 0.95; transform: scale(1.02); }
+  60%       { opacity: 0.9;  transform: scale(0.98); }
+  80%       { opacity: 1;    transform: scale(1.01); }
+}
+.flicker {
+  animation: flicker 2.5s ease-in-out infinite;
+}
+
+/* ─── Section card polish ─── */
+.section-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  box-shadow: var(--shadow-4);
+}
+
+/* ─── Gold border accent ─── */
+.gold-border-top {
+  border-top: 2px solid var(--color-temple-gold);
+}
+
+/* ─── Rank medals ─── */
+.rank-gold   { color: #D4AF37; }
+.rank-silver { color: #A8A9AD; }
+.rank-bronze { color: #CD7F32; }
