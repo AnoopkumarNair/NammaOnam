@@ -1,3 +1,4 @@
+import * as cheerio from "cheerio";
 import Papa from "papaparse";
 import { 
   FestivalConfig, 
@@ -64,10 +65,34 @@ export async function getActivities(): Promise<Activity[]> {
 }
 
 export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
-  const data = await fetchSheetData<WalkathonEntry>("Walkathon");
-  return data
-    .filter(row => row.Active === "TRUE")
-    .sort((a, b) => (Number(a.Rank) || 999) - (Number(b.Rank) || 999));
+  try {
+    const response = await fetch("https://www.mypacer.com/challenges/byb7x5v3/sitara-onam-strides-walk-celebrate-together", { next: { revalidate: 1800 } }); // Cache for 30 min
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    const leaderboard: WalkathonEntry[] = [];
+    
+    $(".row").each((i, el) => {
+      const name = $(el).find(".joined_entity span").text().trim();
+      const rawSteps = $(el).find(".score.other").text().trim();
+      
+      const steps = parseInt(rawSteps.replace(/,/g, ""), 10);
+      
+      if (name && !isNaN(steps)) {
+        leaderboard.push({
+          Rank: i + 1,
+          "Participant Name": name,
+          Steps: steps,
+          Active: true
+        });
+      }
+    });
+
+    return leaderboard;
+  } catch (error) {
+    console.error("Error scraping Pacer:", error);
+    return [];
+  }
 }
 
 export async function getBadmintonFixtures(): Promise<BadmintonFixture[]> {

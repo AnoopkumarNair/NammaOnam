@@ -7,10 +7,12 @@ import { Menu, X } from "lucide-react";
 const NAV_LINKS = [
   { label: "Home",       href: "#" },
   { label: "Activities", href: "#activities" },
+  { label: "Stalls",     href: "#stalls" },
   { label: "Walkathon",  href: "#walkathon" },
   { label: "Badminton",  href: "#badminton" },
-  { label: "Schedule",  href: "#schedule" },
+  { label: "Schedule",   href: "#schedule" },
   { label: "Gallery",    href: "#gallery" },
+  { label: "FAQ",        href: "#faq" },
 ];
 
 interface NavigationBarProps {
@@ -76,7 +78,7 @@ export function NavigationBar({
             </div>
 
             {/* Desktop Links */}
-            <div className="hidden md:flex items-center gap-7">
+            <div className="hidden lg:flex items-center gap-6">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.label}
@@ -111,7 +113,7 @@ export function NavigationBar({
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 rounded-lg transition-colors"
+              className="lg:hidden p-2 rounded-lg transition-colors"
               style={{ color: "#F8F3E7" }}
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -138,7 +140,7 @@ export function NavigationBar({
 
             {/* Drawer */}
             <motion.div
-              className="fixed top-0 right-0 bottom-0 z-[70] w-80 flex flex-col p-8"
+              className="fixed top-0 right-0 bottom-0 z-[70] w-72 sm:w-80 flex flex-col p-6"
               style={{
                 background: "rgba(20, 8, 2, 0.95)",
                 backdropFilter: "blur(24px)",
@@ -149,7 +151,7 @@ export function NavigationBar({
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 26, stiffness: 200 }}
             >
-              <div className="flex justify-between items-start mb-10">
+              <div className="flex justify-between items-start mb-6 shrink-0">
                 <div>
                   <p
                     className="text-xl font-bold gold-shimmer"
@@ -169,7 +171,8 @@ export function NavigationBar({
                 </button>
               </div>
 
-              <div className="flex flex-col gap-2">
+              {/* Links Area */}
+              <div className="flex flex-col gap-0 flex-1 pr-2">
                 {NAV_LINKS.map((link, i) => (
                   <motion.a
                     key={link.label}
@@ -177,8 +180,8 @@ export function NavigationBar({
                     onClick={() => setIsMobileMenuOpen(false)}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06 }}
-                    className="text-lg font-medium py-4 px-4 rounded-xl transition-all duration-200"
+                    transition={{ delay: i * 0.04 }}
+                    className="text-sm font-medium py-2.5 px-3 rounded-lg transition-all duration-200"
                     style={{
                       color: "rgba(248,243,231,0.8)",
                       borderBottom: "1px solid rgba(212,175,55,0.1)",
@@ -189,13 +192,14 @@ export function NavigationBar({
                 ))}
               </div>
 
-              <div className="mt-auto">
+              {/* Sticky Footer Area */}
+              <div className="pt-4 shrink-0 mt-auto">
                 <a
                   href={registrationHref}
                   target={registrationHref.startsWith("http") ? "_blank" : undefined}
                   rel={registrationHref.startsWith("http") ? "noreferrer" : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full text-center px-6 py-4 rounded-full font-semibold"
+                  className="block w-full text-center px-6 py-3.5 rounded-full font-semibold"
                   style={{
                     background: "var(--gradient-gold)",
                     color: "#1E0F08",
