@@ -35,9 +35,9 @@ export function WalkathonTracker({ leaderboard, registrationUrl }: WalkathonTrac
   // Calculate max steps to determine percentages
   const maxSteps = Math.max(...leaderboard.map((e) => Number(e.Steps) || 0), 10000); // minimum 10k max to avoid 100% on small numbers
 
-  // Split into Top 3 and Others
+  // Split into Top 3 and Others (capping at Top 5 total)
   const top3 = leaderboard.slice(0, 3);
-  const others = leaderboard.slice(3);
+  const others = leaderboard.slice(3, 5);
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col gap-12">
@@ -72,17 +72,17 @@ export function WalkathonTracker({ leaderboard, registrationUrl }: WalkathonTrac
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: rankIdx * 0.2, duration: 0.6, type: "spring" }}
-              className={`flex flex-col items-center gap-2 ${isFirst ? "order-2 md:-translate-y-4" : rankIdx === 1 ? "order-1" : "order-3"} w-[30%] max-w-[120px]`}
+              className={`flex flex-col items-center gap-3 ${isFirst ? "order-2 md:-translate-y-6" : rankIdx === 1 ? "order-1 mt-6" : "order-3 mt-6"} w-[32%] max-w-[160px]`}
             >
               <div className="relative flex items-center justify-center">
                 {/* Background Ring */}
-                <svg className="w-16 h-16 md:w-20 md:h-20 transform -rotate-90">
+                <svg className="w-24 h-24 md:w-32 md:h-32 transform -rotate-90">
                   <circle
                     cx="50%"
                     cy="50%"
                     r="35%"
                     stroke="rgba(0,0,0,0.05)"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="none"
                   />
                   {/* Progress Ring */}
@@ -92,7 +92,7 @@ export function WalkathonTracker({ leaderboard, registrationUrl }: WalkathonTrac
                       cy="50%"
                       r="35%"
                       stroke={color}
-                      strokeWidth="8"
+                      strokeWidth="10"
                       fill="none"
                       strokeLinecap="round"
                       initial={{ strokeDashoffset: 100 }}
@@ -105,16 +105,16 @@ export function WalkathonTracker({ leaderboard, registrationUrl }: WalkathonTrac
 
                 {/* Center Content */}
                 <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-xl md:text-2xl mb-0.5">{rankIdx === 0 ? "🥇" : rankIdx === 1 ? "🥈" : "🥉"}</span>
+                  <span className="text-3xl md:text-5xl mb-0.5">{rankIdx === 0 ? "🥇" : rankIdx === 1 ? "🥈" : "🥉"}</span>
                 </div>
               </div>
 
               {/* Name & Steps */}
-              <div className="text-center bg-white/80 backdrop-blur-md px-2 py-1.5 rounded-xl shadow-sm border border-black/5 w-full">
-                <h4 className="font-bold text-[10px] md:text-xs truncate" style={{ color: "var(--color-deep-brown)" }}>
+              <div className="text-center bg-white/90 backdrop-blur-md px-2 py-2 md:px-3 md:py-3 rounded-xl shadow-md border border-black/5 w-full">
+                <h4 className="font-bold text-[11px] md:text-sm truncate" style={{ color: "var(--color-deep-brown)" }}>
                   {entry["Participant Name"]}
                 </h4>
-                <p className="font-semibold text-[9px] md:text-[10px]" style={{ color: color }}>
+                <p className="font-bold text-[11px] md:text-sm mt-0.5" style={{ color: color }}>
                   {steps.toLocaleString()}
                 </p>
               </div>
