@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"; // Never cache — always fetch fresh from Google Drive
+
 export async function GET() {
   try {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
 
     const res = await fetch(scriptUrl, {
-      next: { revalidate: 60 * 1 }, // cache for 1 minute instead of 5
+      cache: "no-store",
     });
 
     if (!res.ok) {
