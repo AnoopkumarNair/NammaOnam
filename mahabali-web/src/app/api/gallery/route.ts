@@ -5,7 +5,7 @@ export async function GET() {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
 
     const res = await fetch(scriptUrl, {
-      next: { revalidate: 60 * 5 }, // cache for 5 minutes
+      next: { revalidate: 60 * 1 }, // cache for 1 minute instead of 5
     });
 
     if (!res.ok) {
