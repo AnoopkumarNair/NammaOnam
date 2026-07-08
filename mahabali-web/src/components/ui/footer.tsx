@@ -86,8 +86,17 @@ export function Footer({ committee, config = {} }: FooterProps) {
         <div>
           <p>&copy; {currentYear} GR Sitara Residents Association. All Rights Reserved.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
           <span>Handcrafted with 💛 for Onam</span>
+          <a 
+            href="https://vercel.com/manavalanz/namma-onam/analytics" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="opacity-30 hover:opacity-100 transition-opacity" 
+            title="View Analytics Dashboard"
+          >
+            📊
+          </a>
         </div>
       </div>
     </footer>
