@@ -86,14 +86,17 @@ export function Gallery() {
             className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-12 cursor-zoom-out"
           >
             {isVideo(selectedFile.name) ? (
-              <video
-                src={`https://drive.google.com/uc?export=download&id=${selectedFile.id}`}
-                className="max-w-full max-h-[85vh] object-contain shadow-2xl bg-black outline-none rounded-md"
-                controls
-                playsInline
-                autoPlay
+              <div 
+                className="w-full max-w-4xl h-[70vh] md:h-auto md:aspect-video shadow-2xl bg-black relative rounded-xl overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
-              />
+              >
+                <iframe
+                  src={`https://drive.google.com/file/d/${selectedFile.id}/preview`}
+                  className="w-full h-full border-0"
+                  allow="fullscreen"
+                  allowFullScreen
+                />
+              </div>
             ) : (
               <motion.img
                 initial={{ scale: 0.9 }}
