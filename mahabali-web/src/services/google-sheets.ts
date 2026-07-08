@@ -1,4 +1,3 @@
-import * as cheerio from "cheerio";
 import Papa from "papaparse";
 import { 
   FestivalConfig, 
@@ -66,31 +65,35 @@ export async function getActivities(): Promise<Activity[]> {
 
 export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
   try {
-    const response = await fetch("https://www.mypacer.com/challenges/byb7x5v3/sitara-onam-strides-walk-celebrate-together", { next: { revalidate: 1800 } }); // Cache for 30 min
-    const html = await response.text();
-    const $ = cheerio.load(html);
+    const url = "https://www.mypacer.com/api/v1/web/main/competitions/6a48a83aba0a86217eac1f30/leaderboard?tab_id=global&page=1&page_size=10";
+    const response = await fetch(url, { cache: 'no-store' }); // Always fetch strictly live data
+    const json = await response.json();
     
     const leaderboard: WalkathonEntry[] = [];
     
-    $(".row").each((i, el) => {
-      const name = $(el).find(".joined_entity span").text().trim();
-      const rawSteps = $(el).find(".score.other").text().trim();
+    if (json.success && json.data && json.data.leaderboards && json.data.leaderboards.length > 0) {
+      const rows = json.data.leaderboards[0].rows;
       
-      const steps = parseInt(rawSteps.replace(/,/g, ""), 10);
-      
-      if (name && !isNaN(steps)) {
-        leaderboard.push({
-          Rank: i + 1,
-          "Participant Name": name,
-          Steps: steps,
-          Active: true
-        });
-      }
-    });
+      rows.forEach((row: any) => {
+        const rank = parseInt(row[0].text, 10);
+        const name = row[1]?.display_text?.main?.trim() || "Unknown";
+        const rawSteps = row[2]?.text || "0";
+        const steps = parseInt(rawSteps.replace(/,/g, ""), 10);
+        
+        if (!isNaN(rank) && !isNaN(steps)) {
+          leaderboard.push({
+            Rank: rank,
+            "Participant Name": name,
+            Steps: steps,
+            Active: true
+          });
+        }
+      });
+    }
 
     return leaderboard;
   } catch (error) {
-    console.error("Error scraping Pacer:", error);
+    console.error("Error fetching Pacer JSON API:", error);
     return [];
   }
 }

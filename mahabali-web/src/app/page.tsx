@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BadmintonBracket } from "@/components/ui/badminton-bracket";
 import { CommitteeGrid } from "@/components/ui/committee-grid";
 import { CulturalTimeline } from "@/components/ui/cultural-timeline";
@@ -280,11 +281,15 @@ function StallCard({ stall }: { stall: Stall }) {
   );
 }
 
+async function WalkathonSection({ registrationUrl }: { registrationUrl?: string }) {
+  const leaderboard = await getWalkathonLeaderboard();
+  return <WalkathonTracker leaderboard={leaderboard} registrationUrl={registrationUrl} />;
+}
+
 export default async function Home() {
-  const [config, activities, leaderboard, fixtures, sponsors, stalls, announcements, committee, culturals, faqs] = await Promise.all([
+  const [config, activities, fixtures, sponsors, stalls, announcements, committee, culturals, faqs] = await Promise.all([
     getConfig(),
     getActivities(),
-    getWalkathonLeaderboard(),
     getBadmintonFixtures(),
     getSponsors(),
     getStalls(),
@@ -372,7 +377,9 @@ export default async function Home() {
 
           {(config["Enable Walkathon"] === true || config["Enable Walkathon"] === "TRUE") && (
             <StackedSection id="walkathon" title="Walkathon Leaderboard" index={3}>
-              <WalkathonTracker leaderboard={leaderboard} registrationUrl={walkathonRegistrationUrl} />
+              <Suspense fallback={<div className="w-full max-w-4xl mx-auto p-8 rounded-2xl bg-white shadow-sm border border-orange-100 flex items-center justify-center min-h-[300px]"><div className="animate-pulse flex flex-col items-center gap-4"><div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin"></div><p className="text-orange-800 font-medium">Fetching Live Leaderboard...</p></div></div>}>
+                <WalkathonSection registrationUrl={walkathonRegistrationUrl} />
+              </Suspense>
             </StackedSection>
           )}
 
