@@ -10,9 +10,11 @@ export async function getDriveAssetsMap(): Promise<Map<string, string>> {
     const map = new Map<string, string>();
     
     if (data && data.files) {
-      data.files.forEach((file: { name: string; webContentLink: string }) => {
-        if (file.name && file.webContentLink) {
-          map.set(file.name, file.webContentLink);
+      data.files.forEach((file: { name: string; id: string; webContentLink: string }) => {
+        if (file.name && file.id) {
+          // Use the direct Google CDN URL — no redirect, no rate-limiting
+          const cdnUrl = `https://lh3.googleusercontent.com/d/${file.id}=w1000`;
+          map.set(file.name, cdnUrl);
         }
       });
     }
@@ -23,3 +25,4 @@ export async function getDriveAssetsMap(): Promise<Map<string, string>> {
     return new Map();
   }
 }
+

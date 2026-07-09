@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'doc-0g-0c-docs.googleusercontent.com',
+      },
+    ],
+  },
 };
 
 export default withPWA(nextConfig);
