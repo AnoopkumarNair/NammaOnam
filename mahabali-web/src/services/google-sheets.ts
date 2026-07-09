@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { getDriveAssetsMap } from "./drive-assets";
 import { 
   FestivalConfig, 
   Activity, 
@@ -63,6 +64,12 @@ export async function getActivities(): Promise<Activity[]> {
     .sort((a, b) => (Number(a['Display Order']) || 0) - (Number(b['Display Order']) || 0));
 }
 
+function resolveAssetUrl(url: string | undefined, driveAssets: Map<string, string>): string | undefined {
+  if (!url || typeof url !== 'string') return url;
+  const filename = url.split('/').pop() || "";
+  return driveAssets.has(filename) ? driveAssets.get(filename) : url;
+}
+
 export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
   try {
     const url = "https://www.mypacer.com/api/v1/web/main/competitions/6a48a83aba0a86217eac1f30/leaderboard?tab_id=global&page=1&page_size=10";
@@ -105,16 +112,31 @@ export async function getBadmintonFixtures(): Promise<BadmintonFixture[]> {
 }
 
 export async function getSponsors(): Promise<Sponsor[]> {
-  const data = await fetchSheetData<Sponsor>("Sponsors");
+  const [data, driveAssets] = await Promise.all([
+    fetchSheetData<Sponsor>("Sponsors"),
+    getDriveAssetsMap()
+  ]);
   return data
     .filter(row => row.Active === "TRUE")
+    .map(row => ({
+      ...row,
+      "Image URL": resolveAssetUrl(row["Image URL"], driveAssets),
+      "Logo URL": resolveAssetUrl(row["Logo URL"], driveAssets)
+    }))
     .sort((a, b) => (Number(a['Display Order']) || 0) - (Number(b['Display Order']) || 0));
 }
 
 export async function getStalls(): Promise<Stall[]> {
-  const data = await fetchSheetData<Stall>("Stalls");
+  const [data, driveAssets] = await Promise.all([
+    fetchSheetData<Stall>("Stalls"),
+    getDriveAssetsMap()
+  ]);
   return data
     .filter(row => row.Active === "TRUE")
+    .map(row => ({
+      ...row,
+      "Image URL": resolveAssetUrl(row["Image URL"], driveAssets)
+    }))
     .sort((a, b) => (Number(a['Display Order']) || 0) - (Number(b['Display Order']) || 0));
 }
 

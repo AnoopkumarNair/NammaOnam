@@ -15,6 +15,31 @@ export async function GET() {
 
     const data = await res.json();
     
+    // Filter out assets used in Stalls and Sponsors
+    try {
+      // Import dynamically to avoid circular dependencies if any
+      const { fetchSheetData } = await import('@/services/google-sheets');
+      const [sponsors, stalls] = await Promise.all([
+        fetchSheetData<any>("Sponsors"),
+        fetchSheetData<any>("Stalls")
+      ]);
+      
+      const usedAssetNames = new Set<string>();
+      sponsors.forEach(s => {
+        if (s["Image URL"]) usedAssetNames.add(s["Image URL"].split('/').pop());
+        if (s["Logo URL"]) usedAssetNames.add(s["Logo URL"].split('/').pop());
+      });
+      stalls.forEach(s => {
+        if (s["Image URL"]) usedAssetNames.add(s["Image URL"].split('/').pop());
+      });
+      
+      if (data && data.files) {
+        data.files = data.files.filter((f: any) => !usedAssetNames.has(f.name));
+      }
+    } catch (e) {
+      console.error("Failed to filter out assets from gallery:", e);
+    }
+    
     // The Apps Script already returns { files: [ { id, name, webContentLink } ] }
     // which exactly matches what the frontend expects!
     return NextResponse.json(data);

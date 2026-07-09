@@ -1,0 +1,25 @@
+export async function getDriveAssetsMap(): Promise<Map<string, string>> {
+  try {
+    // We hit the Apps Script directly rather than localhost to avoid SSR issues
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
+    const res = await fetch(scriptUrl, { next: { revalidate: 60 } });
+    
+    if (!res.ok) return new Map();
+    
+    const data = await res.json();
+    const map = new Map<string, string>();
+    
+    if (data && data.files) {
+      data.files.forEach((file: { name: string; webContentLink: string }) => {
+        if (file.name && file.webContentLink) {
+          map.set(file.name, file.webContentLink);
+        }
+      });
+    }
+    
+    return map;
+  } catch (error) {
+    console.error("Failed to fetch drive assets map:", error);
+    return new Map();
+  }
+}
