@@ -14,6 +14,7 @@ import { PageTransition } from "@/components/ui/page-transition";
 import { SequentialMedia } from "@/components/ui/sequential-media";
 import { SponsorsMarquee } from "@/components/ui/sponsors-marquee";
 import { StackedSection } from "@/components/ui/stacked-section";
+import { StallsCarousel } from "@/components/ui/stalls-carousel";
 import { WalkathonTracker } from "@/components/ui/walkathon-tracker";
 import {
   getActivities,
@@ -251,36 +252,6 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
 }
 
 
-
-function StallCard({ stall }: { stall: Stall }) {
-  return (
-    <article
-      className="flex flex-col h-full rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 bg-white border border-yellow-200/50 shadow-sm hover:shadow-md"
-    >
-      <div className="w-full h-32 flex items-center justify-center overflow-hidden bg-gray-50 border-b border-gray-100 relative group">
-        {stall["Image URL"] ? (
-          <img src={stall["Image URL"]} alt={stall.Title} className="object-cover w-full h-full filter group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-        ) : (
-          <span className="text-4xl text-gray-300">{stall.Title.slice(0, 1)}</span>
-        )}
-        {stall.Location && (
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-2 py-1 rounded shadow-sm text-orange-700">
-            {stall.Location}
-          </div>
-        )}
-      </div>
-      <div className="p-4 flex flex-col flex-1">
-        <h4 className="font-bold text-lg text-[var(--color-deep-brown)] leading-tight">
-          {stall.Title}
-        </h4>
-        <p className="text-sm mt-2 leading-relaxed text-gray-600 flex-1">
-          {stall.Description}
-        </p>
-      </div>
-    </article>
-  );
-}
-
 async function WalkathonSection({ registrationUrl }: { registrationUrl?: string }) {
   const leaderboard = await getWalkathonLeaderboard();
   return <WalkathonTracker leaderboard={leaderboard} registrationUrl={registrationUrl} />;
@@ -363,15 +334,7 @@ export default async function Home() {
 
           {stalls.length > 0 && (
             <StackedSection id="stalls" title="Festival Stalls" index={2}>
-              <div className="w-full relative flex items-center overflow-x-auto pb-4 snap-x">
-                <div className="flex gap-4 px-4 min-w-min">
-                  {stalls.map((stall) => (
-                    <div key={`${stall.Location}-${stall.Title}`} className="snap-center w-[75vw] max-w-[280px] shrink-0">
-                      <StallCard stall={stall} />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <StallsCarousel stalls={stalls} />
             </StackedSection>
           )}
 
