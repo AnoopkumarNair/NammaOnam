@@ -47,14 +47,18 @@ export function IntroScreen() {
   const [done, setDone] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
 
-  // Mount guard (SSR safe)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+    
+    // Detect iOS devices (iPhone, iPad, iPod, and iPads disguised as Macs)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+    
     const params = new URLSearchParams(window.location.search);
     const force  = params.get("forceIntro") === "true";
     const seen   = sessionStorage.getItem("hasSeenNammaOnamIntro");
-    if (force || !seen) {
+    
+    if (force || (!seen && !isIOS)) {
       setShow(true);
       document.body.style.overflow = "hidden";
     }
