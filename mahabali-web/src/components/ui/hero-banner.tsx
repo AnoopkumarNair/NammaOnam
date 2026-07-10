@@ -94,7 +94,9 @@ export function HeroBanner({
 
   useEffect(() => {
     const tick = () => {
-      const diff = new Date(targetDate).getTime() - Date.now();
+      // Safari fix: Only inject 'T' if format is exactly YYYY-MM-DD HH:MM:SS
+      const safeDate = targetDate.replace(/^(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2})/, "$1T$2");
+      const diff = new Date(safeDate).getTime() - Date.now();
       if (diff > 0) {
         setTimeLeft({
           days: Math.floor(diff / 86400000),

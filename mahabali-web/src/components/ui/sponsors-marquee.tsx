@@ -8,9 +8,7 @@ interface SponsorsMarqueeProps {
   sponsors: Sponsor[];
 }
 
-export function SponsorsMarquee({ sponsors }: SponsorsMarqueeProps) {
-  if (!sponsors || sponsors.length === 0) return null;
-
+export function SponsorsMarquee({ sponsors = [] }: SponsorsMarqueeProps) {
   // Separate Title sponsor from the rest ONLY if they are explicitly Title/Platinum
   const titleSponsor = sponsors.find(s => s.Tier?.toLowerCase() === "title" || s.Tier?.toLowerCase() === "platinum");
   const marqueeSponsors = titleSponsor ? sponsors.filter(s => s !== titleSponsor) : sponsors;
