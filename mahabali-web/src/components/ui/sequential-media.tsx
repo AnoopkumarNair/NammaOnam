@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useInView } from "framer-motion";
 
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  // Only render the heavy video if the user scrolls within 600px of it
+  const isInView = useInView(ref, { margin: "600px 0px" });
 
   if (!urls || urls.length === 0) return null;
 
@@ -14,19 +18,25 @@ export function SequentialMedia({ urls, title }: { urls: string[]; title: string
     setCurrentIndex((prev) => (prev + 1) % urls.length);
   };
 
-  return isVideo ? (
-    <video
-      key={currentUrl}
-      src={currentUrl}
-      autoPlay
-      loop={urls.length === 1} // Loop only if there's a single video
-      muted
-      playsInline
-      preload="metadata"
-      className="aspect-video w-full object-cover"
-      onEnded={handleEnded}
-    />
-  ) : (
-    <img src={currentUrl} alt={title} loading="lazy" className="aspect-video w-full object-cover" />
+  return (
+    <div ref={ref} className="aspect-video w-full bg-black/5 relative">
+      {isVideo ? (
+        isInView ? (
+          <video
+            key={currentUrl}
+            src={currentUrl}
+            autoPlay
+            loop={urls.length === 1}
+            muted
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover"
+            onEnded={handleEnded}
+          />
+        ) : null
+      ) : (
+        <img src={currentUrl} alt={title} loading="lazy" className="w-full h-full object-cover" />
+      )}
+    </div>
   );
 }
