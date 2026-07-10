@@ -39,7 +39,7 @@ export function StackedSection({ id, title, children, className, index, icon }: 
       style={isSticky ? { top: `${index * 40}px`, zIndex: index * 10 } : undefined}
     >
       <motion.div
-        style={isSticky ? { scale, opacity } : undefined}
+        style={isSticky ? { scale, opacity } : { scale: 1, opacity: 1 }}
         className="w-[calc(100%-1rem)] md:w-full max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-20 section-card rounded-3xl md:rounded-[2rem] md:min-h-[82vh] flex flex-col overflow-hidden"
       >
         {title && (

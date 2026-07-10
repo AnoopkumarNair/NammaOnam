@@ -47,7 +47,16 @@ export async function GET() {
           }
           
           // 3. Skip if explicitly used in Google Sheets Stalls/Sponsors
-          return !usedAssetNames.has(f.name);
+          if (usedAssetNames.has(f.name)) {
+            return false;
+          }
+
+          // 4. Skip document files (txt, pdf, docx, etc)
+          if (name.endsWith(".txt") || name.endsWith(".pdf") || name.endsWith(".doc") || name.endsWith(".docx")) {
+            return false;
+          }
+
+          return true;
         });
       }
     } catch (e) {
