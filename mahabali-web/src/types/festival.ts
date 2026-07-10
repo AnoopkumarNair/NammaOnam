@@ -90,6 +90,7 @@ export interface CommitteeMember {
 }
 
 export interface CulturalEvent {
+  Date?: string;
   Time: string;
   Title: string;
   Description?: string;
