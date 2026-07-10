@@ -1,7 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useRef, useState, createContext } from "react";
+
+export const SectionVisibilityContext = createContext({ isVisible: true });
 
 interface StackedSectionProps {
   id: string;
@@ -14,9 +16,17 @@ interface StackedSectionProps {
 
 export function StackedSection({ id, title, children, className, index, icon }: StackedSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isSectionActive, setIsSectionActive] = useState(true);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
+  });
+
+  // Track when this sticky section is covered by the next scrolling section
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    // If scroll progress is > 0.88, the section is covered and stacked behind
+    setIsSectionActive(latest < 0.88);
   });
 
   const scale   = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.97, 1, 1, 0.97]);
@@ -55,7 +65,9 @@ export function StackedSection({ id, title, children, className, index, icon }: 
           </div>
         )}
         <div className="flex-1 w-full relative">
-          {children}
+          <SectionVisibilityContext.Provider value={{ isVisible: isSectionActive }}>
+            {children}
+          </SectionVisibilityContext.Provider>
         </div>
       </motion.div>
     </section>

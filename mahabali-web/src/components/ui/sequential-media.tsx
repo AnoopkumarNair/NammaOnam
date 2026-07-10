@@ -1,21 +1,27 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { useInView } from "framer-motion";
+import { SectionVisibilityContext } from "./stacked-section";
 
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   
-  // Trigger when card is 100px away from entering the screen
+  // Track if this media is physically on screen
   const isInView = useInView(containerRef, { margin: "100px 0px" });
+  
+  // Track if the parent section is the active stacked card (not covered by the next card)
+  const { isVisible: isParentVisible } = useContext(SectionVisibilityContext);
+
+  const shouldShow = isInView && isParentVisible;
 
   useEffect(() => {
-    if (!isInView) {
-      setLoaded(false); // Reset load state when scrolled out
+    if (!shouldShow) {
+      setLoaded(false); // Reset load state when scrolled out or covered
     }
-  }, [isInView]);
+  }, [shouldShow]);
 
   if (!urls || urls.length === 0) return null;
 
@@ -30,7 +36,7 @@ export function SequentialMedia({ urls, title }: { urls: string[]; title: string
   return (
     <div ref={containerRef} className="aspect-video w-full bg-slate-900 relative overflow-hidden">
       {isVideo ? (
-        isInView ? (
+        shouldShow ? (
           <video
             key={currentUrl}
             src={currentUrl}
