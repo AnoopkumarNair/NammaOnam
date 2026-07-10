@@ -86,7 +86,6 @@ export function StallsCarousel({ stalls }: StallsCarouselProps) {
       container.scrollLeft = centerScrollOffset;
       // Force reflow
       void container.offsetWidth;
-      container.style.scrollBehavior = "smooth";
       
       isInitialized.current = true;
     }

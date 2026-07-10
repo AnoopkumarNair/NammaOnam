@@ -76,7 +76,6 @@ export function SponsorsMarquee({ sponsors }: SponsorsMarqueeProps) {
       container.style.scrollBehavior = "auto";
       container.scrollLeft = centerScrollOffset;
       void container.offsetWidth;
-      container.style.scrollBehavior = "smooth";
       
       isInitialized.current = true;
     }
