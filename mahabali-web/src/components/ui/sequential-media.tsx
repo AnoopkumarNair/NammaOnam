@@ -3,6 +3,36 @@
 import { useRef, useState, useEffect } from "react";
 import { useInView } from "framer-motion";
 
+export function SafeVideo({ src, className = "w-full h-full object-cover" }: { src: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { margin: "200px 0px" });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) setLoaded(false);
+  }, [isInView]);
+
+  return (
+    <div ref={ref} className="absolute inset-0 w-full h-full bg-slate-900 overflow-hidden">
+      {isInView ? (
+        <video 
+          src={src} 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          preload="metadata" 
+          className={className}
+          onPlay={() => setLoaded(true)}
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity 0.5s ease-out" }}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3b1d11] via-[#521717] to-[#3b1d11]" />
+      )}
+    </div>
+  );
+}
+
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);

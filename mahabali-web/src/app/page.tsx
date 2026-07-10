@@ -11,7 +11,7 @@ import { IntroScreen } from "@/components/ui/intro-screen";
 import { MaveliWidget } from "@/components/ui/maveli-widget";
 import { NavigationBar } from "@/components/ui/navigation-bar";
 import { PageTransition } from "@/components/ui/page-transition";
-import { SequentialMedia } from "@/components/ui/sequential-media";
+import { SequentialMedia, SafeVideo } from "@/components/ui/sequential-media";
 import { SponsorsMarquee } from "@/components/ui/sponsors-marquee";
 import { StackedSection } from "@/components/ui/stacked-section";
 import { StallsCarousel } from "@/components/ui/stalls-carousel";
@@ -142,16 +142,16 @@ function FestivalReels() {
           {FESTIVAL_REELS.map((reel) => {
             const inner = (
               <>
-                <video src={reel.src} autoPlay loop muted playsInline preload="metadata" className="h-40 md:h-44 w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute left-4 right-4 bottom-4">
+                <SafeVideo src={reel.src} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent z-10" />
+                <div className="absolute left-4 right-4 bottom-4 z-20">
                   <span className="text-[10px] uppercase tracking-[0.18em] font-bold text-yellow-200">{reel.label}</span>
                   <h4 className="text-white text-lg font-bold">{reel.title}</h4>
                 </div>
               </>
             );
 
-            const className = "relative shrink-0 w-[76vw] max-w-[300px] md:w-auto rounded-2xl overflow-hidden bg-black shadow-lg block transition-transform hover:-translate-y-1";
+            const className = "relative shrink-0 w-[76vw] max-w-[300px] h-40 md:h-44 md:w-auto rounded-2xl overflow-hidden bg-black shadow-lg block transition-transform hover:-translate-y-1";
 
             if (reel.href) {
               return (
