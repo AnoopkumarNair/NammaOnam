@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 // ─── Cinematic scenes ───────────────────────────────────────────────────────
 // Each scene: image, duration in ms, Ken Burns direction, title overlay
@@ -114,14 +115,20 @@ export function IntroScreen() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.9, ease: "easeInOut" }}
           >
-            <motion.img
-              src={scene.img}
-              alt=""
-              className="w-full h-full object-cover"
+            <motion.div
+              className="w-full h-full"
               initial={{ scale: scene.scale.from }}
               animate={{ scale: scene.scale.to }}
               transition={{ duration: scene.duration / 1000 + 0.4, ease: "linear" }}
-            />
+            >
+              <Image
+                src={scene.img}
+                alt=""
+                fill
+                priority
+                className="object-cover"
+              />
+            </motion.div>
           </motion.div>
         </AnimatePresence>
 

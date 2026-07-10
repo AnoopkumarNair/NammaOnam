@@ -94,10 +94,20 @@ export function HeroBanner({
 
   useEffect(() => {
     const tick = () => {
-      // Safari fix: Only inject 'T' if format is exactly YYYY-MM-DD HH:MM:SS
-      const safeDate = targetDate.replace(/^(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2})/, "$1T$2");
-      const diff = new Date(safeDate).getTime() - Date.now();
-      if (diff > 0) {
+      let parsedTime = new Date(targetDate).getTime();
+      
+      // Fallback 1: Safari fails on YYYY-MM-DD HH:MM:SS. Inject 'T'.
+      if (isNaN(parsedTime)) {
+        parsedTime = new Date(targetDate.replace(" ", "T")).getTime();
+      }
+      
+      // Fallback 2: Safari fails on some YYYY-MM-DD variations. Swap to slashes.
+      if (isNaN(parsedTime)) {
+        parsedTime = new Date(targetDate.replace(/-/g, "/")).getTime();
+      }
+
+      const diff = parsedTime - Date.now();
+      if (!isNaN(diff) && diff > 0) {
         setTimeLeft({
           days: Math.floor(diff / 86400000),
           hours: Math.floor((diff / 3600000) % 24),
