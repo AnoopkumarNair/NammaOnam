@@ -5,13 +5,26 @@ import { useInView } from "framer-motion";
 
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { margin: "600px 0px" });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
-  const [isIOS, setIsIOS] = useState(false);
+  // Trigger when 20% of the video is visible to start buffering
+  const isInView = useInView(containerRef, { margin: "0px", amount: 0.2 });
+
   useEffect(() => {
-    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document));
-  }, []);
+    if (videoRef.current) {
+      if (isInView) {
+        // Use a tiny timeout to avoid interrupting the main scroll thread
+        setTimeout(() => {
+          videoRef.current?.play().catch(() => {
+            // Silently ignore Safari auto-play rejection if it happens
+          });
+        }, 100);
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isInView, currentIndex]);
 
   if (!urls || urls.length === 0) return null;
 
@@ -23,23 +36,19 @@ export function SequentialMedia({ urls, title }: { urls: string[]; title: string
   };
 
   return (
-    <div ref={ref} className="aspect-video w-full bg-black/5 relative">
+    <div ref={containerRef} className="aspect-video w-full bg-slate-900 relative overflow-hidden">
       {isVideo ? (
-        isIOS ? (
-          <div className="w-full h-full bg-slate-900" />
-        ) : isInView ? (
-          <video
-            key={currentUrl}
-            src={currentUrl}
-            autoPlay
-            loop={urls.length === 1}
-            muted
-            playsInline
-            preload="metadata"
-            className="w-full h-full object-cover"
-            onEnded={handleEnded}
-          />
-        ) : null
+        <video
+          ref={videoRef}
+          key={currentUrl}
+          src={currentUrl}
+          loop={urls.length === 1}
+          muted
+          playsInline
+          preload="none"
+          className="w-full h-full object-cover"
+          onEnded={handleEnded}
+        />
       ) : (
         <img src={currentUrl} alt={title} loading="lazy" className="w-full h-full object-cover" />
       )}
