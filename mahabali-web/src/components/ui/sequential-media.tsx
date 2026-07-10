@@ -1,13 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useInView } from "framer-motion";
 
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  // Only render the heavy video if the user scrolls within 600px of it
   const isInView = useInView(ref, { margin: "600px 0px" });
+  
+  const [isIOS, setIsIOS] = useState(false);
+  useEffect(() => {
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document));
+  }, []);
 
   if (!urls || urls.length === 0) return null;
 
@@ -21,7 +25,9 @@ export function SequentialMedia({ urls, title }: { urls: string[]; title: string
   return (
     <div ref={ref} className="aspect-video w-full bg-black/5 relative">
       {isVideo ? (
-        isInView ? (
+        isIOS ? (
+          <div className="w-full h-full bg-slate-900" />
+        ) : isInView ? (
           <video
             key={currentUrl}
             src={currentUrl}

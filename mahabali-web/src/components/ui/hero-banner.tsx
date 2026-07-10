@@ -83,6 +83,8 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   );
 }
 
+import Image from "next/image";
+
 export function HeroBanner({
   title,
   subtitle,
@@ -126,7 +128,7 @@ export function HeroBanner({
   return (
     <section className="relative w-full min-h-[92svh] md:min-h-[100svh] flex flex-col items-center justify-center overflow-hidden py-24 md:py-28">
       <div className="absolute inset-0 z-0">
-        <img src="/kerala-dawn.png" alt="Kerala dawn" className="w-full h-full object-cover" />
+        <Image src="/kerala-dawn.png" alt="Kerala dawn" fill priority className="object-cover" />
         <div
           className="absolute inset-0"
           style={{
