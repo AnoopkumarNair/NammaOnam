@@ -6,25 +6,16 @@ import { useInView } from "framer-motion";
 export function SequentialMedia({ urls, title }: { urls: string[]; title: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [loaded, setLoaded] = useState(false);
   
-  // Trigger when 20% of the video is visible to start buffering
-  const isInView = useInView(containerRef, { margin: "0px", amount: 0.2 });
+  // Trigger when card is 100px away from entering the screen
+  const isInView = useInView(containerRef, { margin: "100px 0px" });
 
   useEffect(() => {
-    if (videoRef.current) {
-      if (isInView) {
-        // Use a tiny timeout to avoid interrupting the main scroll thread
-        setTimeout(() => {
-          videoRef.current?.play().catch(() => {
-            // Silently ignore Safari auto-play rejection if it happens
-          });
-        }, 100);
-      } else {
-        videoRef.current.pause();
-      }
+    if (!isInView) {
+      setLoaded(false); // Reset load state when scrolled out
     }
-  }, [isInView, currentIndex]);
+  }, [isInView]);
 
   if (!urls || urls.length === 0) return null;
 
@@ -33,24 +24,52 @@ export function SequentialMedia({ urls, title }: { urls: string[]; title: string
 
   const handleEnded = () => {
     setCurrentIndex((prev) => (prev + 1) % urls.length);
+    setLoaded(false);
   };
 
   return (
     <div ref={containerRef} className="aspect-video w-full bg-slate-900 relative overflow-hidden">
       {isVideo ? (
-        <video
-          ref={videoRef}
-          key={currentUrl}
-          src={currentUrl}
-          loop={urls.length === 1}
-          muted
-          playsInline
-          preload="none"
-          className="w-full h-full object-cover"
-          onEnded={handleEnded}
-        />
+        isInView ? (
+          <video
+            key={currentUrl}
+            src={currentUrl}
+            autoPlay
+            loop={urls.length === 1}
+            muted
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover"
+            onEnded={handleEnded}
+            onPlay={() => setLoaded(true)}
+            style={{ 
+              opacity: loaded ? 1 : 0, 
+              transition: "opacity 0.5s ease-out" 
+            }}
+          />
+        ) : (
+          // Beautiful gradient placeholder while out of view to avoid iOS OOM crash
+          <div 
+            className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3b1d11] via-[#521717] to-[#3b1d11]"
+            style={{ borderBottom: "1px solid rgba(212,175,55,0.1)" }}
+          >
+            <div className="text-yellow-100/10 text-4xl font-bold select-none uppercase tracking-[0.2em] font-sans">
+              Onam
+            </div>
+          </div>
+        )
       ) : (
-        <img src={currentUrl} alt={title} loading="lazy" className="w-full h-full object-cover" />
+        <img 
+          src={currentUrl} 
+          alt={title} 
+          loading="lazy" 
+          className="w-full h-full object-cover" 
+          onLoad={() => setLoaded(true)}
+          style={{ 
+            opacity: loaded ? 1 : 0, 
+            transition: "opacity 0.5s ease-out" 
+          }}
+        />
       )}
     </div>
   );
