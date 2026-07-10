@@ -43,11 +43,8 @@ export function CulturalTimeline({ events }: CulturalTimelineProps) {
                   {event.Icon || "🌟"}
                 </div>
                 <div>
-                  <span className="block text-[10px] font-bold text-[var(--color-brand-primary)] uppercase tracking-widest">
-                    {event.Time?.split(" - ")[0]}
-                  </span>
-                  <span className="block text-[10px] text-gray-500 font-semibold uppercase">
-                    {event.Time?.split(" - ")[1] ? `TO ${event.Time?.split(" - ")[1]}` : ''}
+                  <span className="block text-xs font-bold text-[var(--color-deep-brown)] uppercase tracking-widest">
+                    {event.Time}
                   </span>
                 </div>
               </div>
