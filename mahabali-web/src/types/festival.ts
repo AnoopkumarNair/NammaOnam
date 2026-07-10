@@ -91,6 +91,7 @@ export interface CommitteeMember {
 
 export interface CulturalEvent {
   Date?: string;
+  Track?: string;
   Time: string;
   Title: string;
   Description?: string;

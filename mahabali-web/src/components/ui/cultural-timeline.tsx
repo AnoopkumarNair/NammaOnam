@@ -62,7 +62,16 @@ export function CulturalTimeline({ events }: CulturalTimelineProps) {
                     <div className="w-12 h-12 rounded-full bg-[var(--color-brand-secondary)] border-2 border-yellow-100 flex items-center justify-center shadow-sm text-2xl shrink-0">
                       {event.Icon || "🌟"}
                     </div>
-                    <div>
+                    <div className="flex flex-col gap-1 items-start">
+                      {event.Track && (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm ${
+                          event.Track.toLowerCase().includes('main') 
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300' 
+                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        }`}>
+                          {event.Track}
+                        </span>
+                      )}
                       <span className="block text-xs font-bold text-[var(--color-deep-brown)] uppercase tracking-widest">
                         {event.Time}
                       </span>
