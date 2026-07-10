@@ -1,9 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
-import { useRef, useState, createContext } from "react";
-
-export const SectionVisibilityContext = createContext({ isVisible: true });
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
 
 interface StackedSectionProps {
   id: string;
@@ -16,31 +14,32 @@ interface StackedSectionProps {
 
 export function StackedSection({ id, title, children, className, index, icon }: StackedSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isSectionActive, setIsSectionActive] = useState(true);
+  
+  // Detect iOS/iPad to completely disable sticky stacking on mobile
+  const [isIOS, setIsIOS] = useState(false);
+  useEffect(() => {
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document));
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // Track when this sticky section is covered by the next scrolling section
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    // If scroll progress is > 0.88, the section is covered and stacked behind
-    setIsSectionActive(latest < 0.88);
-  });
-
   const scale   = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.97, 1, 1, 0.97]);
   const opacity = useTransform(scrollYProgress, [0, 0.12, 0.88, 1], [0.5, 1, 1, 0.6]);
+
+  const isSticky = !isIOS; // Only sticky stack on Desktop, scroll normally on iOS
 
   return (
     <section
       id={id}
       ref={containerRef}
-      className={`relative w-full flex flex-col items-center justify-start md:sticky ${className ?? ""}`}
-      style={{ top: `${index * 40}px`, zIndex: index * 10 }}
+      className={`relative w-full flex flex-col items-center justify-start ${isSticky ? "md:sticky" : ""} ${className ?? ""}`}
+      style={isSticky ? { top: `${index * 40}px`, zIndex: index * 10 } : undefined}
     >
       <motion.div
-        style={{ scale, opacity }}
+        style={isSticky ? { scale, opacity } : undefined}
         className="w-[calc(100%-1rem)] md:w-full max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-20 section-card rounded-3xl md:rounded-[2rem] md:min-h-[82vh] flex flex-col overflow-hidden"
       >
         {title && (
@@ -65,9 +64,7 @@ export function StackedSection({ id, title, children, className, index, icon }: 
           </div>
         )}
         <div className="flex-1 w-full relative">
-          <SectionVisibilityContext.Provider value={{ isVisible: isSectionActive }}>
-            {children}
-          </SectionVisibilityContext.Provider>
+          {children}
         </div>
       </motion.div>
     </section>
