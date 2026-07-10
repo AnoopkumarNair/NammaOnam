@@ -60,7 +60,9 @@ export function SponsorsMarquee({ sponsors }: SponsorsMarqueeProps) {
   const extendedSponsors = Array(multiplier).fill(marqueeSponsors).flat();
 
   useEffect(() => {
-    if (!isInitialized.current && containerRef.current && containerWidth > 0 && marqueeSponsors.length > 0) {
+    if (!containerRef.current || containerWidth === 0 || marqueeSponsors.length === 0) return;
+
+    if (!isInitialized.current) {
       const container = containerRef.current;
       
       const isMobile = containerWidth < 768;
@@ -77,8 +79,9 @@ export function SponsorsMarquee({ sponsors }: SponsorsMarqueeProps) {
       container.style.scrollBehavior = "smooth";
       
       isInitialized.current = true;
-      startAutoPlay();
     }
+    
+    startAutoPlay();
     
     return () => stopAutoPlay();
   }, [containerWidth, marqueeSponsors.length]);
