@@ -19,7 +19,10 @@ export async function fetchSheetData<T>(sheetName: string): Promise<T[]> {
   const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheetName}&headers=1`;
   
   try {
-    const response = await fetch(url, { next: { revalidate: 60 } }); // Cache for 60 seconds (Next.js App Router feature)
+    const response = await fetch(url, { 
+      next: { revalidate: 60 },
+      signal: AbortSignal.timeout(4000)
+    }); // Cache for 60 seconds (Next.js App Router feature)
     if (!response.ok) {
       throw new Error(`Failed to fetch sheet: ${sheetName}`);
     }
@@ -73,7 +76,10 @@ function resolveAssetUrl(url: string | undefined, driveAssets: Map<string, strin
 export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
   try {
     const url = "https://www.mypacer.com/api/v1/web/main/competitions/6a48a83aba0a86217eac1f30/leaderboard?tab_id=global&page=1&page_size=10";
-    const response = await fetch(url, { cache: 'no-store' }); // Always fetch strictly live data
+    const response = await fetch(url, { 
+      cache: 'no-store',
+      signal: AbortSignal.timeout(4000)
+    }); // Always fetch strictly live data
     const json = await response.json();
     
     const leaderboard: WalkathonEntry[] = [];
