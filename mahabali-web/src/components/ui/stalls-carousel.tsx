@@ -12,11 +12,16 @@ export function StallsCarousel({ stalls }: StallsCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(375);
   const [isInteracting, setIsInteracting] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<number | null>(null);
   const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
 
   // Hook into scroll position of our scroll container using Framer Motion
   const { scrollX } = useScroll({ container: containerRef });
+  
+  // Duplicate stalls to create a near-infinite scrolling experience
+  const multiplier = 200;
+  const extendedStalls = Array(multiplier).fill(stalls).flat();
 
   // Track container width for centering calculations
   useEffect(() => {
@@ -37,32 +42,55 @@ export function StallsCarousel({ stalls }: StallsCarouselProps) {
     return 280;
   };
 
-  // Auto-play scrolling logic
+  // Auto-play continuous scrolling logic
   const startAutoPlay = () => {
     stopAutoPlay();
-    timerRef.current = setInterval(() => {
-      const container = containerRef.current;
-      if (!container) return;
+    let lastTime = performance.now();
+    const speed = 0.05; // pixels per ms (~50px per second)
 
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      
-      // If we are close to the end, wrap around to 0
-      if (container.scrollLeft >= maxScroll - 15) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        // Scroll by exactly one card width + gap
-        const cardWidth = getCardWidth(containerWidth);
-        container.scrollBy({ left: cardWidth + 16, behavior: "smooth" });
+    const step = (time: number) => {
+      const dt = time - lastTime;
+      const container = containerRef.current;
+      if (container && dt > 0) {
+        container.scrollLeft += speed * dt;
       }
-    }, 4500);
+      lastTime = time;
+      animationRef.current = requestAnimationFrame(step);
+    };
+    
+    animationRef.current = requestAnimationFrame(step);
   };
 
   const stopAutoPlay = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
   };
+
+  useEffect(() => {
+    if (!isInitialized.current && containerRef.current && containerWidth > 0 && stalls.length > 0) {
+      const container = containerRef.current;
+      const cardWidth = getCardWidth(containerWidth);
+      const cardTotalWidth = cardWidth + 16;
+      const padding = 16;
+      
+      // Start in the middle of our extended array
+      const middleIndex = Math.floor(multiplier / 2) * stalls.length;
+      
+      // Calculate exact scroll position for the middle item
+      const centerScrollOffset = middleIndex * cardTotalWidth - (containerWidth - cardWidth) / 2 + padding;
+      
+      // Temporarily disable smooth behavior for instant jump
+      container.style.scrollBehavior = "auto";
+      container.scrollLeft = centerScrollOffset;
+      // Force reflow
+      void container.offsetWidth;
+      container.style.scrollBehavior = "smooth";
+      
+      isInitialized.current = true;
+    }
+  }, [containerWidth, stalls.length]);
 
   useEffect(() => {
     if (!isInteracting) {
@@ -111,10 +139,11 @@ export function StallsCarousel({ stalls }: StallsCarouselProps) {
       {/* Scrollable Container with Native Scroll Snap and 3D Perspective */}
       <div
         ref={containerRef}
-        onScroll={handleInteraction}
         onTouchStart={handleInteraction}
+        onTouchMove={handleInteraction}
         onMouseDown={handleInteraction}
-        className="w-full flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-6 px-4"
+        onWheel={handleInteraction}
+        className="w-full flex gap-4 overflow-x-auto pb-6 px-4"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -129,9 +158,9 @@ export function StallsCarousel({ stalls }: StallsCarouselProps) {
           }
         `}} />
         
-        {stalls.map((stall, idx) => (
+        {extendedStalls.map((stall, idx) => (
           <StallCardWrapper 
-            key={`${stall.Location}-${stall.Title}`}
+            key={`${stall.Location}-${stall.Title}-${idx}`}
             stall={stall}
             index={idx}
             scrollX={scrollX}
@@ -207,10 +236,10 @@ function StallCardWrapper({ stall, index, scrollX, containerWidth }: StallCardWr
         z,
         transformStyle: "preserve-3d",
       }}
-      className="snap-center shrink-0"
+      className="shrink-0"
     >
-      <article className="flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-yellow-200/50 shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div className="w-full aspect-video flex items-center justify-center overflow-hidden bg-orange-50/20 border-b border-orange-100/30 relative group p-3">
+      <article className="flex flex-col h-full rounded-2xl overflow-hidden bg-white/95 border-2 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:shadow-[0_0_25px_rgba(251,191,36,0.6)] hover:-translate-y-1 transition-all duration-500 backdrop-blur-sm">
+        <div className="w-full aspect-video flex items-center justify-center overflow-hidden bg-gradient-to-br from-orange-50/40 to-amber-100/20 border-b-2 border-amber-200/50 relative group p-3">
           {stall["Image URL"] ? (
             <img
               src={stall["Image URL"]}

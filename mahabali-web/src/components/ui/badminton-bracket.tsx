@@ -9,19 +9,21 @@ interface BadmintonBracketProps {
   registrationUrl?: string;
 }
 
-// Stage configuration for colors
-const STAGES = {
-  QF: { color: "#e67e22", bg: "bg-[#e67e22]", text: "text-[#e67e22]", label: "Quarter Finals" },
-  SF: { color: "#8e44ad", bg: "bg-[#8e44ad]", text: "text-[#8e44ad]", label: "Semi-Finals" },
-  FN: { color: "#d4af37", bg: "bg-[#d4af37]", text: "text-[#d4af37]", label: "Finals" },
+const getStageConfig = (matchesInRound: number) => {
+  if (matchesInRound === 1) return { color: "#d4af37", bg: "bg-[#d4af37]", text: "text-[#d4af37]", label: "Finals", icon: "🏆 " };
+  if (matchesInRound === 2) return { color: "#8e44ad", bg: "bg-[#8e44ad]", text: "text-[#8e44ad]", label: "Semi-Finals", icon: "" };
+  if (matchesInRound === 4) return { color: "#e67e22", bg: "bg-[#e67e22]", text: "text-[#e67e22]", label: "Quarter Finals", icon: "" };
+  if (matchesInRound === 8) return { color: "#2980b9", bg: "bg-[#2980b9]", text: "text-[#2980b9]", label: "Round of 16", icon: "" };
+  if (matchesInRound === 16) return { color: "#27ae60", bg: "bg-[#27ae60]", text: "text-[#27ae60]", label: "Round of 32", icon: "" };
+  return { color: "#7f8c8d", bg: "bg-[#7f8c8d]", text: "text-[#7f8c8d]", label: `Round of ${matchesInRound * 2}`, icon: "" };
 };
 
-const MatchCard = ({ match, stage, delayIdx = 0 }: { match: any; stage: keyof typeof STAGES; delayIdx?: number }) => {
+const MatchCard = ({ match, matchesInRound, delayIdx = 0 }: { match: any; matchesInRound: number; delayIdx?: number }) => {
   if (!match) return <div className="h-[120px] w-[260px] opacity-0" />;
   
   const isCompleted = match.Status?.toLowerCase() === "completed";
   const isLive = match.Status?.toLowerCase() === "live";
-  const stageConfig = STAGES[stage];
+  const stageConfig = getStageConfig(matchesInRound);
 
   return (
     <motion.div
@@ -100,9 +102,16 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
     return displayFixtures.filter(f => (f.Category || "General") === activeTab);
   }, [displayFixtures, activeTab]);
 
-  // Ensure we always have exactly 7 matches to build the layout for a standard 8-team tree
+  // Dynamically calculate tournament depth
+  let depth = 1;
+  let targetCount = 1;
+  while (targetCount < activeFixtures.length) {
+    depth++;
+    targetCount = (1 << depth) - 1; 
+  }
+
   const paddedFixtures = [...activeFixtures];
-  while (paddedFixtures.length < 7) {
+  while (paddedFixtures.length < targetCount) {
     paddedFixtures.push({
       "Match Name": `Match ${paddedFixtures.length + 1}`,
       "Team A": "TBD",
@@ -115,12 +124,22 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
     });
   }
 
-  // Organize by stages (assuming 7 matches for QF -> SF -> FN)
-  const qf = paddedFixtures.slice(0, 4);
-  const sf = paddedFixtures.slice(4, 6);
-  const fn = paddedFixtures.slice(6, 7);
+  // Organize into rounds
+  const rounds = [];
+  let currentIndex = 0;
+  for (let i = depth - 1; i >= 0; i--) {
+    const matchesInRound = 1 << i;
+    rounds.push({
+      matchesInRound,
+      matches: paddedFixtures.slice(currentIndex, currentIndex + matchesInRound),
+      stageConfig: getStageConfig(matchesInRound)
+    });
+    currentIndex += matchesInRound;
+  }
 
-  const champion = fn.find(m => m.Status?.toLowerCase() === "completed")?.Winner;
+  // Champion is the winner of the last match (Finals)
+  const finalMatch = rounds[rounds.length - 1]?.matches[0];
+  const champion = finalMatch?.Status?.toLowerCase() === "completed" ? finalMatch.Winner : null;
 
   return (
     <div className="w-full flex flex-col items-center pb-8">
@@ -245,59 +264,49 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
             }
           `}} />
 
-          {/* Quarter Finals Column */}
-          {qf.length === 4 && (
-            <div className="flex flex-col gap-4 relative">
-              <div className={`stage-header ${STAGES.QF.bg} w-[260px]`}>
-                {STAGES.QF.label}
-              </div>
-              
-              <div className="flex flex-col justify-around h-full gap-8 py-4">
-                {/* Pair 1 */}
-                <div className="bracket-pair flex flex-col justify-center h-full gap-[60px]">
-                  <div className="bracket-connector-right"><MatchCard match={qf[0]} stage="QF" delayIdx={0} /></div>
-                  <div className="bracket-connector-right"><MatchCard match={qf[1]} stage="QF" delayIdx={1} /></div>
-                </div>
+          {rounds.map((round, rIdx) => {
+            const isLast = rIdx === rounds.length - 1;
+            
+            // Group matches into pairs
+            const pairs = [];
+            for (let i = 0; i < round.matches.length; i += 2) {
+              if (i + 1 < round.matches.length) {
+                pairs.push([round.matches[i], round.matches[i + 1]]);
+              } else {
+                pairs.push([round.matches[i]]); // Should only happen if length is odd
+              }
+            }
 
-                {/* Pair 2 */}
-                <div className="bracket-pair flex flex-col justify-center h-full gap-[60px]">
-                  <div className="bracket-connector-right"><MatchCard match={qf[2]} stage="QF" delayIdx={2} /></div>
-                  <div className="bracket-connector-right"><MatchCard match={qf[3]} stage="QF" delayIdx={3} /></div>
+            return (
+              <div key={rIdx} className="flex flex-col gap-4 relative">
+                <div className={`stage-header ${round.stageConfig.bg} w-[260px]`}>
+                  {round.stageConfig.icon}{round.stageConfig.label}
                 </div>
+                
+                {isLast ? (
+                   // Finals column
+                   <div className="flex flex-col justify-center h-full py-4 min-h-[160px]">
+                     <div className={`w-max mx-auto relative ${rIdx !== 0 ? "bracket-connector-left" : ""}`}>
+                       <MatchCard match={round.matches[0]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
+                     </div>
+                   </div>
+                ) : (
+                   <div className="flex flex-col h-full py-4 min-h-[400px]">
+                     {pairs.map((pair, pIdx) => (
+                       <div key={pIdx} className="bracket-pair flex-1 flex flex-col justify-around relative min-h-[200px]">
+                         <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
+                           <MatchCard match={pair[0]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
+                         </div>
+                         <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
+                           <MatchCard match={pair[1]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Semi Finals Column */}
-          {sf.length === 2 && (
-            <div className="flex flex-col gap-4 relative">
-              <div className={`stage-header ${STAGES.SF.bg} w-[260px]`}>
-                {STAGES.SF.label}
-              </div>
-              
-              <div className="flex flex-col justify-around h-full py-4">
-                <div className="bracket-pair flex flex-col justify-center h-full gap-[220px]">
-                  <div className="bracket-connector-left bracket-connector-right"><MatchCard match={sf[0]} stage="SF" delayIdx={4} /></div>
-                  <div className="bracket-connector-left bracket-connector-right"><MatchCard match={sf[1]} stage="SF" delayIdx={5} /></div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Finals Column */}
-          {fn.length === 1 && (
-            <div className="flex flex-col gap-4 relative">
-              <div className={`stage-header ${STAGES.FN.bg} w-[260px]`}>
-                🏆 {STAGES.FN.label}
-              </div>
-              
-              <div className="flex flex-col justify-center h-full py-4">
-                <div className="bracket-connector-left">
-                  <MatchCard match={fn[0]} stage="FN" delayIdx={6} />
-                </div>
-              </div>
-            </div>
-          )}
+            );
+          })}
 
         </div>
       </div>

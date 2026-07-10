@@ -12,11 +12,23 @@ interface HeroBannerProps {
 }
 
 const PETALS = [
-  { left: "8%", delay: 0, duration: 12, size: 16 },
-  { left: "24%", delay: 2.5, duration: 15, size: 12 },
-  { left: "44%", delay: 1, duration: 11, size: 18 },
-  { left: "68%", delay: 0.5, duration: 13, size: 12 },
-  { left: "88%", delay: 1.8, duration: 10, size: 14 },
+  { left: "5%", delay: 0, duration: 12, size: 36, color: "#FFFFFF" },
+  { left: "15%", delay: 3, duration: 14, size: 28, color: "#E53935" },
+  { left: "22%", delay: 1, duration: 11, size: 42, color: "#FDD835" },
+  { left: "30%", delay: 4, duration: 16, size: 24, color: "#43A047" },
+  { left: "38%", delay: 2, duration: 13, size: 32, color: "#800000" },
+  { left: "45%", delay: 0.5, duration: 10, size: 38, color: "#FFFFFF" },
+  { left: "55%", delay: 3.5, duration: 15, size: 26, color: "#FDD835" },
+  { left: "62%", delay: 1.5, duration: 12, size: 40, color: "#E53935" },
+  { left: "70%", delay: 0.2, duration: 14, size: 30, color: "#43A047" },
+  { left: "80%", delay: 2.8, duration: 11, size: 34, color: "#800000" },
+  { left: "88%", delay: 1.2, duration: 13, size: 36, color: "#FFFFFF" },
+  { left: "95%", delay: 4.5, duration: 16, size: 28, color: "#FDD835" },
+  { left: "10%", delay: 5.5, duration: 14, size: 32, color: "#E53935" },
+  { left: "50%", delay: 6.0, duration: 11, size: 24, color: "#800000" },
+  { left: "85%", delay: 7.0, duration: 15, size: 38, color: "#43A047" },
+  { left: "25%", delay: 8.0, duration: 12, size: 30, color: "#FFFFFF" },
+  { left: "75%", delay: 9.5, duration: 14, size: 42, color: "#FDD835" },
 ];
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
@@ -124,6 +136,7 @@ export function HeroBanner({
             animationDuration: `${petal.duration}s`,
             animationDelay: `${petal.delay}s`,
             fontSize: petal.size,
+            color: petal.color,
           }}
         >
           *
