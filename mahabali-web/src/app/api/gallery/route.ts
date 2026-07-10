@@ -34,7 +34,21 @@ export async function GET() {
       });
       
       if (data && data.files) {
-        data.files = data.files.filter((f: any) => !usedAssetNames.has(f.name));
+        data.files = data.files.filter((f: any) => {
+          // 1. Skip if parent folder name is explicitly "assets" (case-insensitive)
+          if (f.parentName && f.parentName.toLowerCase() === "assets") {
+            return false;
+          }
+          
+          // 2. Skip if filename matches stall_ or sponsor_ prefixes (fallback)
+          const name = f.name?.toLowerCase() || "";
+          if (name.startsWith("stall_") || name.startsWith("sponsor_")) {
+            return false;
+          }
+          
+          // 3. Skip if explicitly used in Google Sheets Stalls/Sponsors
+          return !usedAssetNames.has(f.name);
+        });
       }
     } catch (e) {
       console.error("Failed to filter out assets from gallery:", e);
