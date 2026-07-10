@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React from "react";
 import type { Sponsor } from "@/types/festival";
 
 interface SponsorsMarqueeProps {
@@ -12,76 +11,6 @@ export function SponsorsMarquee({ sponsors = [] }: SponsorsMarqueeProps) {
   // Separate Title sponsor from the rest ONLY if they are explicitly Title/Platinum
   const titleSponsor = sponsors.find(s => s.Tier?.toLowerCase() === "title" || s.Tier?.toLowerCase() === "platinum");
   const marqueeSponsors = titleSponsor ? sponsors.filter(s => s !== titleSponsor) : sponsors;
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(1000);
-  const animationRef = useRef<number | null>(null);
-  const isInitialized = useRef(false);
-
-  const { scrollX } = useScroll({ container: containerRef });
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) setContainerWidth(containerRef.current.clientWidth);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const startAutoPlay = () => {
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    let lastTime = performance.now();
-    const speed = 0.05; // 50px per second
-
-    const step = (time: number) => {
-      const dt = time - lastTime;
-      const container = containerRef.current;
-      if (container && dt > 0) {
-        container.scrollLeft += speed * dt;
-      }
-      lastTime = time;
-      animationRef.current = requestAnimationFrame(step);
-    };
-    
-    animationRef.current = requestAnimationFrame(step);
-  };
-
-  const stopAutoPlay = () => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-  };
-
-  const multiplier = 200;
-  const extendedSponsors = Array(multiplier).fill(marqueeSponsors).flat();
-
-  useEffect(() => {
-    if (!containerRef.current || containerWidth === 0 || marqueeSponsors.length === 0) return;
-
-    if (!isInitialized.current) {
-      const container = containerRef.current;
-      
-      const isMobile = containerWidth < 768;
-      const cardWidth = isMobile ? 128 : 160; 
-      const gap = 64; 
-      const cardTotalWidth = cardWidth + gap;
-      
-      const middleIndex = Math.floor(multiplier / 2) * marqueeSponsors.length;
-      const centerScrollOffset = middleIndex * cardTotalWidth - (containerWidth - cardWidth) / 2;
-      
-      container.style.scrollBehavior = "auto";
-      container.scrollLeft = centerScrollOffset;
-      void container.offsetWidth;
-      
-      isInitialized.current = true;
-    }
-    
-    startAutoPlay();
-    
-    return () => stopAutoPlay();
-  }, [containerWidth, marqueeSponsors.length]);
 
   return (
     <div className="w-full bg-white border-y border-yellow-200/50 py-10 overflow-hidden flex flex-col items-center">
@@ -123,35 +52,16 @@ export function SponsorsMarquee({ sponsors = [] }: SponsorsMarqueeProps) {
       )}
 
       {marqueeSponsors.length > 0 && (
-        <div className="w-full relative flex items-center py-6">
+        <div className="w-full relative flex items-center py-6 overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
           
-          <div 
-            ref={containerRef}
-            onTouchStart={stopAutoPlay}
-            onTouchMove={stopAutoPlay}
-            onMouseDown={stopAutoPlay}
-            onWheel={stopAutoPlay}
-            className="w-full flex gap-16 overflow-x-auto pb-6 px-0"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            <style dangerouslySetInnerHTML={{__html: `
-              div::-webkit-scrollbar {
-                display: none !important;
-              }
-            `}} />
-            
-            {extendedSponsors.map((sponsor, idx) => (
-              <SponsorCardWrapper 
+          <div className="flex animate-marquee gap-16 w-max">
+            {/* Repeat twice for continuous infinite loop */}
+            {[...marqueeSponsors, ...marqueeSponsors].map((sponsor, idx) => (
+              <SponsorCard 
                 key={`${sponsor.Title}-${idx}`}
                 sponsor={sponsor}
-                index={idx}
-                scrollX={scrollX}
-                containerWidth={containerWidth}
               />
             ))}
           </div>
@@ -161,30 +71,9 @@ export function SponsorsMarquee({ sponsors = [] }: SponsorsMarqueeProps) {
   );
 }
 
-function SponsorCardWrapper({ sponsor, index, scrollX, containerWidth }: any) {
-  const isMobile = containerWidth < 768;
-  const cardWidth = isMobile ? 128 : 160; 
-  const gap = 64; // gap-16 = 64px
-  const cardTotalWidth = cardWidth + gap;
-
-  // Assuming container has px-0
-  const centerScrollOffset = index * cardTotalWidth - (containerWidth - cardWidth) / 2;
-
-  const range = [
-    centerScrollOffset - cardTotalWidth * 2,
-    centerScrollOffset,
-    centerScrollOffset + cardTotalWidth * 2
-  ];
-
-  // Scale up to 1.4x in the center, fade edges
-  const scale = useTransform(scrollX, range, [0.75, 1.4, 0.75]);
-  const opacity = useTransform(scrollX, range, [0.3, 1, 0.3]);
-
+function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
   return (
-    <motion.div 
-      style={{ scale, opacity, width: cardWidth }}
-      className="shrink-0 flex items-center justify-center h-20 md:h-24"
-    >
+    <div className="shrink-0 flex items-center justify-center h-20 md:h-24 w-32 md:w-40">
       {sponsor["Website URL"] ? (
         <a href={sponsor["Website URL"]} target="_blank" rel="noreferrer" className="block w-full h-full">
           {sponsor["Logo URL"] || sponsor["Image URL"] ? (
@@ -202,6 +91,6 @@ function SponsorCardWrapper({ sponsor, index, scrollX, containerWidth }: any) {
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
