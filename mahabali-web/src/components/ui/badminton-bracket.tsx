@@ -13,7 +13,7 @@ const getStageConfig = (matchesInRound: number) => {
   if (matchesInRound === 1) return { color: "#d4af37", bg: "bg-[#d4af37]", text: "text-[#d4af37]", label: "Finals", icon: "🏆 " };
   if (matchesInRound === 2) return { color: "#8e44ad", bg: "bg-[#8e44ad]", text: "text-[#8e44ad]", label: "Semi-Finals", icon: "" };
   if (matchesInRound === 4) return { color: "#e67e22", bg: "bg-[#e67e22]", text: "text-[#e67e22]", label: "Quarter Finals", icon: "" };
-  if (matchesInRound === 8) return { color: "#2980b9", bg: "bg-[#2980b9]", text: "text-[#2980b9]", label: "Round of 16", icon: "" };
+  if (matchesInRound === 8) return { color: "#2980b9", bg: "bg-[#2980b9]", text: "text-[#2980b9]", label: "Knockouts", icon: "" };
   if (matchesInRound === 16) return { color: "#27ae60", bg: "bg-[#27ae60]", text: "text-[#27ae60]", label: "Round of 32", icon: "" };
   return { color: "#7f8c8d", bg: "bg-[#7f8c8d]", text: "text-[#7f8c8d]", label: `Round of ${matchesInRound * 2}`, icon: "" };
 };
@@ -114,7 +114,7 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
       if (name.includes("final") && !name.includes("semi") && !name.includes("quarter")) d = 0;
       else if (name.includes("semi")) d = 1;
       else if (name.includes("quarter")) d = 2;
-      else if (name.includes("16") || name.includes("pre-quarter")) d = 3;
+      else if (name.includes("16") || name.includes("pre-quarter") || name.includes("knock")) d = 3;
       else if (name.includes("32")) d = 4;
       else if (name.includes("64")) d = 5;
 
