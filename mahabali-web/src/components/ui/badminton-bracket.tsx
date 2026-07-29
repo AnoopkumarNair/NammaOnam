@@ -6,7 +6,7 @@ import { BadmintonFixture } from "@/types/festival";
 
 interface BadmintonBracketProps {
   fixtures: BadmintonFixture[];
-  registrationUrl?: string;
+  rulesUrl?: string;
 }
 
 const getStageConfig = (matchesInRound: number) => {
@@ -70,7 +70,7 @@ const MatchCard = ({ match, matchesInRound, delayIdx = 0 }: { match: any; matche
   );
 };
 
-export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracketProps) {
+export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) {
   const hasData = fixtures && fixtures.length > 0;
   
   // High quality dummy data to match World Cup style
@@ -238,15 +238,15 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
         </div>
       )}
 
-      {registrationUrl && (
+      {rulesUrl && (
         <div className="flex flex-col items-center mb-4">
           <a 
-            href={registrationUrl} 
+            href={rulesUrl} 
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-[#d4af37] text-white px-6 py-2 rounded-full font-bold shadow-md hover:bg-yellow-600 transition-colors mb-6"
+            className="bg-[#d4af37] text-white px-6 py-2 rounded-full font-bold shadow-md hover:bg-yellow-600 transition-colors mb-6 flex items-center gap-2"
           >
-            🏸 Register for Badminton
+            <span>📖</span> Official Rules & Regulations
           </a>
         </div>
       )}

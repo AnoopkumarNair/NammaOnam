@@ -28,6 +28,7 @@ import {
   getCulturalEvents,
   getFaqs,
 } from "@/services/google-sheets";
+import { getDriveAssetsMap } from "@/services/drive-assets";
 import type { Activity, Sponsor, Stall } from "@/types/festival";
 
 const REGISTRATION_KEYS = [
@@ -258,7 +259,7 @@ async function WalkathonSection({ registrationUrl }: { registrationUrl?: string 
 }
 
 export default async function Home() {
-  const [config, activities, fixtures, sponsors, stalls, announcements, committee, culturals, faqs] = await Promise.all([
+  const [config, activities, fixtures, sponsors, stalls, announcements, committee, culturals, faqs, driveAssetsMap] = await Promise.all([
     getConfig(),
     getActivities(),
     getBadmintonFixtures(),
@@ -268,6 +269,7 @@ export default async function Home() {
     getCommittee(),
     getCulturalEvents(),
     getFaqs(),
+    getDriveAssetsMap(),
   ]);
 
   const title = getText(config["Festival Name"]) || "Namma Onam 2.0";
@@ -279,7 +281,7 @@ export default async function Home() {
     activities.map((activity) => getRegistrationUrl(activity as unknown as Record<string, unknown>)).find(Boolean) ||
     "#activities";
   const walkathonRegistrationUrl = findActivityUrl(activities, "walkathon");
-  const badmintonRegistrationUrl = findActivityUrl(activities, "badminton");
+  const rulesPdfUrl = driveAssetsMap.get("GR_Sitara_Onam_Badminton_Tournament_Official_Guide_for_Rules_Regulations.pdf") || "";
 
   return (
     <PageTransition className="flex flex-col min-h-screen">
@@ -348,7 +350,7 @@ export default async function Home() {
 
           {(config["Enable Badminton"] === true || config["Enable Badminton"] === "TRUE") && (
             <StackedSection id="badminton" title="Badminton Tournament" index={4}>
-              <BadmintonBracket fixtures={fixtures} registrationUrl={badmintonRegistrationUrl} />
+              <BadmintonBracket fixtures={fixtures} rulesUrl={rulesPdfUrl} />
             </StackedSection>
           )}
 

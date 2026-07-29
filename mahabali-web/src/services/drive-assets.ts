@@ -15,9 +15,14 @@ export async function getDriveAssetsMap(): Promise<Map<string, string>> {
     if (data && data.files) {
       data.files.forEach((file: { name: string; id: string; webContentLink: string }) => {
         if (file.name && file.id) {
-          // Use the direct Google CDN URL — no redirect, no rate-limiting
-          const cdnUrl = `https://lh3.googleusercontent.com/d/${file.id}=w1000`;
-          map.set(file.name, cdnUrl);
+          const isDoc = file.name.toLowerCase().match(/\.(pdf|docx?|xlsx?|txt)$/);
+          if (isDoc) {
+            map.set(file.name, `https://drive.google.com/file/d/${file.id}/view`);
+          } else {
+            // Use the direct Google CDN URL — no redirect, no rate-limiting
+            const cdnUrl = `https://lh3.googleusercontent.com/d/${file.id}=w1000`;
+            map.set(file.name, cdnUrl);
+          }
         }
       });
     }
