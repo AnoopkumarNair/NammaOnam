@@ -75,18 +75,18 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
   
   // High quality dummy data to match World Cup style
   const displayFixtures = hasData ? fixtures : [
-    { "Match Name": "MATCH-1", "Team A": "Rahul & Ajay", "Team B": "Vikram & Sunil", Status: "Completed", Winner: "Rahul & Ajay", Date: "15-08-2026 - 10:00 AM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "MATCH-2", "Team A": "Karthik & Manoj", "Team B": "Deepak & Hari", Status: "Completed", Winner: "Karthik & Manoj", Date: "15-08-2026 - 10:45 AM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "MATCH-3", "Team A": "Sanjay & Amit", "Team B": "Praveen & Raj", Status: "Completed", Winner: "Sanjay & Amit", Date: "15-08-2026 - 11:30 AM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "MATCH-4", "Team A": "Arun & Naveen", "Team B": "Gokul & Pradeep", Status: "Upcoming", Winner: "", Date: "15-08-2026 - 12:15 PM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "MATCH-5", "Team A": "Rahul & Ajay", "Team B": "Karthik & Manoj", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 09:00 AM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "MATCH-6", "Team A": "Sanjay & Amit", "Team B": "TBD", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 09:45 AM", Category: "Mens Doubles", Active: true },
-    { "Match Name": "FINAL", "Team A": "TBD", "Team B": "TBD", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 04:00 PM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Quarter Final 1", "Team A": "Rahul & Ajay", "Team B": "Vikram & Sunil", Status: "Completed", Winner: "Rahul & Ajay", Date: "15-08-2026 - 10:00 AM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Quarter Final 2", "Team A": "Karthik & Manoj", "Team B": "Deepak & Hari", Status: "Completed", Winner: "Karthik & Manoj", Date: "15-08-2026 - 10:45 AM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Quarter Final 3", "Team A": "Sanjay & Amit", "Team B": "Praveen & Raj", Status: "Completed", Winner: "Sanjay & Amit", Date: "15-08-2026 - 11:30 AM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Quarter Final 4", "Team A": "Arun & Naveen", "Team B": "Gokul & Pradeep", Status: "Upcoming", Winner: "", Date: "15-08-2026 - 12:15 PM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Semi Final 1", "Team A": "Rahul & Ajay", "Team B": "Karthik & Manoj", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 09:00 AM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Semi Final 2", "Team A": "Sanjay & Amit", "Team B": "TBD", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 09:45 AM", Category: "Mens Doubles", Active: true },
+    { "Match Name": "Final", "Team A": "TBD", "Team B": "TBD", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 04:00 PM", Category: "Mens Doubles", Active: true },
     
     // Womens Singles
-    { "Match Name": "MATCH-1", "Team A": "Priya", "Team B": "Anita", Status: "Completed", Winner: "Priya", Date: "15-08-2026 - 02:00 PM", Category: "Womens Singles", Active: true },
-    { "Match Name": "MATCH-2", "Team A": "Lakshmi", "Team B": "Meera", Status: "Completed", Winner: "Meera", Date: "15-08-2026 - 02:30 PM", Category: "Womens Singles", Active: true },
-    { "Match Name": "FINAL", "Team A": "Priya", "Team B": "Meera", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 11:00 AM", Category: "Womens Singles", Active: true },
+    { "Match Name": "Semi Final 1", "Team A": "Priya", "Team B": "Anita", Status: "Completed", Winner: "Priya", Date: "15-08-2026 - 02:00 PM", Category: "Womens Singles", Active: true },
+    { "Match Name": "Semi Final 2", "Team A": "Lakshmi", "Team B": "Meera", Status: "Completed", Winner: "Meera", Date: "15-08-2026 - 02:30 PM", Category: "Womens Singles", Active: true },
+    { "Match Name": "Final", "Team A": "Priya", "Team B": "Meera", Status: "Upcoming", Winner: "", Date: "16-08-2026 - 11:00 AM", Category: "Womens Singles", Active: true },
   ];
 
   // Extract unique categories
@@ -102,40 +102,109 @@ export function BadmintonBracket({ fixtures, registrationUrl }: BadmintonBracket
     return displayFixtures.filter(f => (f.Category || "General") === activeTab);
   }, [displayFixtures, activeTab]);
 
-  // Dynamically calculate tournament depth
-  let depth = 1;
-  let targetCount = 1;
-  while (targetCount < activeFixtures.length) {
-    depth++;
-    targetCount = (1 << depth) - 1; 
-  }
+  // Organize by round based on match name keywords
+  const rounds = useMemo(() => {
+    let maxDepth = -1;
+    const fixtureDepths = new Map<BadmintonFixture, number>();
+    const unknownFixtures: BadmintonFixture[] = [];
 
-  const paddedFixtures = [...activeFixtures];
-  while (paddedFixtures.length < targetCount) {
-    paddedFixtures.push({
-      "Match Name": `Match ${paddedFixtures.length + 1}`,
-      "Team A": "TBD",
-      "Team B": "TBD",
-      Status: "Upcoming",
-      Winner: "",
-      Date: "TBD",
-      Category: activeTab,
-      Active: true
-    });
-  }
+    activeFixtures.forEach(f => {
+      const name = (f["Match Name"] || "").toLowerCase();
+      let d = -1;
+      if (name.includes("final") && !name.includes("semi") && !name.includes("quarter")) d = 0;
+      else if (name.includes("semi")) d = 1;
+      else if (name.includes("quarter")) d = 2;
+      else if (name.includes("16") || name.includes("pre-quarter")) d = 3;
+      else if (name.includes("32")) d = 4;
+      else if (name.includes("64")) d = 5;
 
-  // Organize into rounds
-  const rounds = [];
-  let currentIndex = 0;
-  for (let i = depth - 1; i >= 0; i--) {
-    const matchesInRound = 1 << i;
-    rounds.push({
-      matchesInRound,
-      matches: paddedFixtures.slice(currentIndex, currentIndex + matchesInRound),
-      stageConfig: getStageConfig(matchesInRound)
+      if (d !== -1) {
+        if (d > maxDepth) maxDepth = d;
+        fixtureDepths.set(f, d);
+      } else {
+        unknownFixtures.push(f);
+      }
     });
-    currentIndex += matchesInRound;
-  }
+
+    if (maxDepth === -1) {
+      // Original sequential fallback logic for when NO keywords are present
+      let depth = 1;
+      let targetCount = 1;
+      while (targetCount < activeFixtures.length) {
+        depth++;
+        targetCount = (1 << depth) - 1; 
+      }
+
+      const paddedFixtures = [...activeFixtures];
+      while (paddedFixtures.length < targetCount) {
+        paddedFixtures.push({
+          "Match Name": `Match ${paddedFixtures.length + 1}`,
+          "Team A": "TBD",
+          "Team B": "TBD",
+          Status: "Upcoming",
+          Winner: "",
+          Date: "TBD",
+          Category: activeTab,
+          Active: true
+        });
+      }
+
+      const builtRounds = [];
+      let currentIndex = 0;
+      for (let i = depth - 1; i >= 0; i--) {
+        const matchesInRound = 1 << i;
+        builtRounds.push({
+          matchesInRound,
+          matches: paddedFixtures.slice(currentIndex, currentIndex + matchesInRound),
+          stageConfig: getStageConfig(matchesInRound)
+        });
+        currentIndex += matchesInRound;
+      }
+      return builtRounds;
+    } else {
+      // Keyword based allocation
+      if (unknownFixtures.length > 0) {
+        // Distribute unknowns filling from maxDepth + 1 upwards
+        const remainingUnknowns = [...unknownFixtures];
+        while (remainingUnknowns.length > 0) {
+          maxDepth++;
+          const capacity = 1 << maxDepth;
+          const startIdx = Math.max(0, remainingUnknowns.length - capacity);
+          const toAssign = remainingUnknowns.splice(startIdx, capacity);
+          toAssign.forEach(f => fixtureDepths.set(f, maxDepth));
+        }
+      }
+
+      const totalRounds = maxDepth + 1;
+      const builtRounds = [];
+
+      for (let i = totalRounds - 1; i >= 0; i--) {
+        const matchesInRound = 1 << i;
+        const roundFixtures = activeFixtures.filter(f => fixtureDepths.get(f) === i);
+        
+        const paddedRoundFixtures = [...roundFixtures];
+        while (paddedRoundFixtures.length < matchesInRound) {
+          paddedRoundFixtures.push({
+            "Match Name": i === 0 ? "Final" : i === 1 ? "Semi-Final" : i === 2 ? "Quarter-Final" : `Round of ${matchesInRound * 2}`,
+            "Team A": "TBD",
+            "Team B": "TBD",
+            Status: "Upcoming",
+            Winner: "",
+            Date: "TBD",
+            Category: activeTab,
+            Active: true
+          });
+        }
+
+        builtRounds.push({
+          matchesInRound,
+          matches: paddedRoundFixtures.slice(0, matchesInRound),
+          stageConfig: getStageConfig(matchesInRound)
+        });
+      }
+      return builtRounds;
+    }
+  }, [activeFixtures, activeTab]);
 
   // Champion is the winner of the last match (Finals)
   const finalMatch = rounds[rounds.length - 1]?.matches[0];
