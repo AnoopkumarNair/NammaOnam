@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface StackedSectionProps {
   id: string;
@@ -13,42 +12,25 @@ interface StackedSectionProps {
 }
 
 export function StackedSection({ id, title, children, className, index, icon }: StackedSectionProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Detect iOS/iPad to completely disable sticky stacking on mobile
-  const [isIOS, setIsIOS] = useState(false);
-  useEffect(() => {
-    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document));
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  const scale   = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.97, 1, 1, 0.97]);
-  const opacity = useTransform(scrollYProgress, [0, 0.12, 0.88, 1], [0.5, 1, 1, 0.6]);
-
-  const isSticky = !isIOS; // Only sticky stack on Desktop, scroll normally on iOS
-
   return (
     <section
       id={id}
-      ref={containerRef}
-      className={`relative w-full flex flex-col items-center justify-start ${isSticky ? "md:sticky" : ""} ${className ?? ""}`}
-      style={isSticky ? { top: `${index * 40}px`, zIndex: index * 10 } : undefined}
+      className={`relative w-full flex flex-col items-center justify-start my-4 md:my-8 ${className ?? ""}`}
     >
       <motion.div
-        style={isSticky ? { scale, opacity } : { scale: 1, opacity: 1 }}
-        className="w-[calc(100%-1rem)] md:w-full max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-20 section-card rounded-3xl md:rounded-[2rem] md:min-h-[82vh] flex flex-col overflow-hidden"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="w-[calc(100%-1.5rem)] md:w-[95%] max-w-7xl mx-auto px-5 md:px-12 py-10 md:py-20 section-card rounded-3xl md:rounded-[2.5rem] flex flex-col overflow-hidden shadow-xl"
       >
         {title && (
-          <div className="text-center mb-7 md:mb-14">
+          <div className="text-center mb-8 md:mb-16">
             {icon && (
-              <div className="text-3xl md:text-4xl mb-3 md:mb-4">{icon}</div>
+              <div className="text-3xl md:text-5xl mb-4 md:mb-6">{icon}</div>
             )}
             <h2
-              className="text-2xl md:text-5xl font-bold"
+              className="text-3xl md:text-5xl font-bold tracking-tight"
               style={{
                 fontFamily: "'Playfair Display', serif",
                 color: "var(--foreground)",
@@ -58,7 +40,7 @@ export function StackedSection({ id, title, children, className, index, icon }: 
             </h2>
             {/* Gold rule under every section title */}
             <div
-              className="mx-auto mt-4 h-px w-20"
+              className="mx-auto mt-6 h-[2px] w-24 rounded-full"
               style={{ background: "var(--gradient-gold)" }}
             />
           </div>
