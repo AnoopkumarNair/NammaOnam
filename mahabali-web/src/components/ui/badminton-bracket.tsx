@@ -9,21 +9,20 @@ interface BadmintonBracketProps {
   rulesUrl?: string;
 }
 
-const getStageConfig = (matchesInRound: number) => {
-  if (matchesInRound === 1) return { color: "#d4af37", bg: "bg-[#d4af37]", text: "text-[#d4af37]", label: "Finals", icon: "🏆 " };
-  if (matchesInRound === 2) return { color: "#8e44ad", bg: "bg-[#8e44ad]", text: "text-[#8e44ad]", label: "Semi-Finals", icon: "" };
-  if (matchesInRound === 4) return { color: "#e67e22", bg: "bg-[#e67e22]", text: "text-[#e67e22]", label: "Quarter Finals", icon: "" };
-  if (matchesInRound === 8) return { color: "#2980b9", bg: "bg-[#2980b9]", text: "text-[#2980b9]", label: "Knockouts", icon: "" };
-  if (matchesInRound === 16) return { color: "#27ae60", bg: "bg-[#27ae60]", text: "text-[#27ae60]", label: "Round of 32", icon: "" };
-  return { color: "#7f8c8d", bg: "bg-[#7f8c8d]", text: "text-[#7f8c8d]", label: `Round of ${matchesInRound * 2}`, icon: "" };
+const getStageConfigByDepth = (depth: number, totalRounds: number) => {
+  if (depth === 0) return { color: "#d4af37", bg: "bg-[#d4af37]", text: "text-[#d4af37]", label: "Finals", icon: "🏆 " };
+  if (depth === 1) return { color: "#8e44ad", bg: "bg-[#8e44ad]", text: "text-[#8e44ad]", label: "Semi-Finals", icon: "" };
+  if (depth === 2) return { color: "#e67e22", bg: "bg-[#e67e22]", text: "text-[#e67e22]", label: "Quarter Finals", icon: "" };
+  if (depth === 3) return { color: "#2980b9", bg: "bg-[#2980b9]", text: "text-[#2980b9]", label: "Knockouts", icon: "" };
+  if (depth === 4) return { color: "#27ae60", bg: "bg-[#27ae60]", text: "text-[#27ae60]", label: "Round of 32", icon: "" };
+  return { color: "#7f8c8d", bg: "bg-[#7f8c8d]", text: "text-[#7f8c8d]", label: `Stage ${totalRounds - depth}`, icon: "" };
 };
 
-const MatchCard = ({ match, matchesInRound, delayIdx = 0 }: { match: any; matchesInRound: number; delayIdx?: number }) => {
+const MatchCard = ({ match, stageConfig, delayIdx = 0 }: { match: any; stageConfig: any; delayIdx?: number }) => {
   if (!match) return <div className="h-[120px] w-[260px] opacity-0" />;
   
   const isCompleted = match.Status?.toLowerCase() === "completed";
   const isLive = match.Status?.toLowerCase() === "live";
-  const stageConfig = getStageConfig(matchesInRound);
 
   return (
     <motion.div
@@ -135,29 +134,18 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
         targetCount = (1 << depth) - 1; 
       }
 
-      const paddedFixtures = [...activeFixtures];
-      while (paddedFixtures.length < targetCount) {
-        paddedFixtures.push({
-          "Match Name": `Match ${paddedFixtures.length + 1}`,
-          "Team A": "TBD",
-          "Team B": "TBD",
-          Status: "Upcoming",
-          Winner: "",
-          Date: "TBD",
-          Category: activeTab,
-          Active: true
-        });
-      }
-
       const builtRounds = [];
       let currentIndex = 0;
       for (let i = depth - 1; i >= 0; i--) {
         const matchesInRound = 1 << i;
-        builtRounds.push({
-          matchesInRound,
-          matches: paddedFixtures.slice(currentIndex, currentIndex + matchesInRound),
-          stageConfig: getStageConfig(matchesInRound)
-        });
+        const matches = activeFixtures.slice(currentIndex, currentIndex + matchesInRound);
+        if (matches.length > 0) {
+          builtRounds.push({
+            matchesInRound: matches.length,
+            matches,
+            stageConfig: getStageConfigByDepth(i, depth)
+          });
+        }
         currentIndex += matchesInRound;
       }
       return builtRounds;
@@ -179,28 +167,14 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
       const builtRounds = [];
 
       for (let i = totalRounds - 1; i >= 0; i--) {
-        const matchesInRound = 1 << i;
         const roundFixtures = activeFixtures.filter(f => fixtureDepths.get(f) === i);
-        
-        const paddedRoundFixtures = [...roundFixtures];
-        while (paddedRoundFixtures.length < matchesInRound) {
-          paddedRoundFixtures.push({
-            "Match Name": i === 0 ? "Final" : i === 1 ? "Semi-Final" : i === 2 ? "Quarter-Final" : `Round of ${matchesInRound * 2}`,
-            "Team A": "TBD",
-            "Team B": "TBD",
-            Status: "Upcoming",
-            Winner: "",
-            Date: "TBD",
-            Category: activeTab,
-            Active: true
+        if (roundFixtures.length > 0 || i === 0) { // Keep Finals even if empty for shape
+          builtRounds.push({
+            matchesInRound: roundFixtures.length,
+            matches: roundFixtures,
+            stageConfig: getStageConfigByDepth(i, totalRounds)
           });
         }
-
-        builtRounds.push({
-          matchesInRound,
-          matches: paddedRoundFixtures.slice(0, matchesInRound),
-          stageConfig: getStageConfig(matchesInRound)
-        });
       }
       return builtRounds;
     }
@@ -355,20 +329,26 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
                 {isLast ? (
                    // Finals column
                    <div className="flex flex-col justify-center h-full py-4 min-h-[160px]">
-                     <div className={`w-max mx-auto relative ${rIdx !== 0 ? "bracket-connector-left" : ""}`}>
-                       <MatchCard match={round.matches[0]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
-                     </div>
+                     {round.matches[0] && (
+                       <div className={`w-max mx-auto relative ${rIdx !== 0 ? "bracket-connector-left" : ""}`}>
+                         <MatchCard match={round.matches[0]} stageConfig={round.stageConfig} delayIdx={rIdx} />
+                       </div>
+                     )}
                    </div>
                 ) : (
                    <div className="flex flex-col h-full py-4 min-h-[400px]">
                      {pairs.map((pair, pIdx) => (
                        <div key={pIdx} className="bracket-pair flex-1 flex flex-col justify-around relative min-h-[200px]">
-                         <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
-                           <MatchCard match={pair[0]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
-                         </div>
-                         <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
-                           <MatchCard match={pair[1]} matchesInRound={round.matchesInRound} delayIdx={rIdx} />
-                         </div>
+                         {pair[0] && (
+                           <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
+                             <MatchCard match={pair[0]} stageConfig={round.stageConfig} delayIdx={rIdx} />
+                           </div>
+                         )}
+                         {pair[1] && (
+                           <div className={`w-max mx-auto relative ${rIdx !== 0 ? 'bracket-connector-left' : ''} bracket-connector-right`}>
+                             <MatchCard match={pair[1]} stageConfig={round.stageConfig} delayIdx={rIdx} />
+                           </div>
+                         )}
                        </div>
                      ))}
                    </div>
