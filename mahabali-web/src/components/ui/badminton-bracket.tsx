@@ -241,47 +241,11 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
       <div className="w-full overflow-x-auto custom-scrollbar px-4 pb-8">
         <div className="min-w-max flex items-stretch justify-center gap-12 mx-auto relative pt-4">
           
-          {/* Custom Styles for Connector Lines */}
           <style dangerouslySetInnerHTML={{ __html: `
-            .bracket-connector-right {
-              position: relative;
-            }
-            .bracket-connector-right::after {
-              content: '';
-              position: absolute;
-              right: -1.5rem;
-              top: 50%;
-              width: 1.5rem;
-              height: 2px;
-              background-color: #cbd5e1;
-              z-index: 0;
-            }
-            .bracket-pair {
-              position: relative;
-            }
-            .bracket-pair::after {
-              content: '';
-              position: absolute;
-              right: -1.5rem;
-              top: 25%;
-              bottom: 25%;
-              width: 2px;
-              background-color: #cbd5e1;
-              z-index: 0;
-            }
-            .bracket-connector-left {
-              position: relative;
-            }
-            .bracket-connector-left::before {
-              content: '';
-              position: absolute;
-              left: -1.5rem;
-              top: 50%;
-              width: 1.5rem;
-              height: 2px;
-              background-color: #cbd5e1;
-              z-index: 0;
-            }
+            /* Connector lines removed to support non-binary round robin brackets natively */
+            .bracket-connector-right { position: relative; }
+            .bracket-pair { position: relative; }
+            .bracket-connector-left { position: relative; }
             .custom-scrollbar::-webkit-scrollbar {
               height: 8px;
             }
