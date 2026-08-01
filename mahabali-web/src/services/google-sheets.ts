@@ -20,9 +20,9 @@ export async function fetchSheetData<T>(sheetName: string): Promise<T[]> {
   
   try {
     const response = await fetch(url, { 
-      next: { revalidate: 60 },
+      cache: "no-store",
       signal: AbortSignal.timeout(4000)
-    }); // Cache for 60 seconds (Next.js App Router feature)
+    }); // Always fetch live sheet data immediately without caching
     if (!response.ok) {
       throw new Error(`Failed to fetch sheet: ${sheetName}`);
     }
@@ -114,7 +114,7 @@ export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
 export async function getBadmintonFixtures(): Promise<BadmintonFixture[]> {
   const data = await fetchSheetData<BadmintonFixture>("Badminton");
   return data
-    .filter(row => row.Active === "TRUE");
+    .filter(row => String(row.Active || "").trim().toUpperCase() === "TRUE");
 }
 
 export async function getSponsors(): Promise<Sponsor[]> {

@@ -8,7 +8,6 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   turbopack: {},
-  // @ts-expect-error - Some versions type this differently or strictly
   allowedDevOrigins: ["192.168.0.100", "localhost"],
   typescript: {
     ignoreBuildErrors: true,

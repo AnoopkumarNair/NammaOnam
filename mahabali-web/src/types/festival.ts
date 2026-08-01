@@ -7,15 +7,15 @@ export interface FestivalConfig {
   "Secondary Color"?: string;
   "Logo"?: string;
   "Maveli Asset Pack"?: string;
-  "Intro Enabled"?: boolean;
+  "Intro Enabled"?: boolean | string;
   "Festival Live Date"?: string;
-  "Enable Walkathon"?: boolean;
-  "Enable Badminton"?: boolean;
-  "Enable Gallery"?: boolean;
-  "Enable AI Assistant"?: boolean;
-  "Enable Fireworks"?: boolean;
-  "Enable Easter Eggs"?: boolean;
-  "Enable Push Notifications"?: boolean;
+  "Enable Walkathon"?: boolean | string;
+  "Enable Badminton"?: boolean | string;
+  "Enable Gallery"?: boolean | string;
+  "Enable AI Assistant"?: boolean | string;
+  "Enable Fireworks"?: boolean | string;
+  "Enable Easter Eggs"?: boolean | string;
+  "Enable Push Notifications"?: boolean | string;
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
@@ -33,14 +33,14 @@ export interface Activity {
   "Button Label"?: string;
   Time?: string;
   Location?: string;
-  Active: boolean;
+  Active: boolean | string;
 }
 
 export interface WalkathonEntry {
   Rank: number;
   "Participant Name": string;
   Steps: number;
-  Active: boolean;
+  Active: boolean | string;
 }
 
 export interface BadmintonFixture {
@@ -51,7 +51,8 @@ export interface BadmintonFixture {
   "Team B": string;
   Winner?: string;
   Category?: string;
-  Active: boolean;
+  Score?: string;
+  Active: boolean | string;
 }
 
 export interface Sponsor {
@@ -62,7 +63,7 @@ export interface Sponsor {
   Description?: string;
   Tier: string;
   "Display Order"?: number;
-  Active: boolean;
+  Active: boolean | string;
 }
 
 export interface Stall {
@@ -71,13 +72,13 @@ export interface Stall {
   "Image URL"?: string;
   Location: string;
   "Display Order"?: number;
-  Active: boolean;
+  Active: boolean | string;
 }
 
 export interface Announcement {
   Title: string;
   Priority: string;
-  Active: boolean;
+  Active: boolean | string;
 }
 
 export interface CommitteeMember {
