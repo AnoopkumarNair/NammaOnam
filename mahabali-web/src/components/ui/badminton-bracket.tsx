@@ -273,7 +273,7 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search player name... (e.g. Sajith, Mithun)"
-            className="w-full bg-white border border-gray-200 rounded-full pl-9 pr-9 py-2 text-xs sm:text-sm shadow-xs focus:outline-none focus:border-[var(--color-onam-orange)] focus:ring-1 focus:ring-[var(--color-onam-orange)] transition-all placeholder:text-gray-400"
+            className="w-full bg-white text-gray-900 font-medium border border-gray-300 rounded-full pl-9 pr-9 py-2.5 text-xs sm:text-sm shadow-xs focus:outline-none focus:border-[var(--color-onam-orange)] focus:ring-2 focus:ring-[var(--color-onam-orange)]/20 transition-all placeholder:text-gray-400"
           />
           {searchQuery && (
             <button
