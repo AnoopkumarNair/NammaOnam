@@ -31,6 +31,8 @@ function BracketCard({ match, color }: { match: BadmintonFixture; color: string 
   const live = isLive(match.Status);
   const winner = norm(match.Winner);
   const score = (match.Score || "").trim();
+  const datePart = (match.Date || "").split(" - ")[0] || "";
+  const timePart = (match.Date || "").split(" - ")[1] || "";
 
   const Team = ({ name }: { name: string }) => {
     const n = name.trim() || "TBD";
@@ -44,9 +46,6 @@ function BracketCard({ match, color }: { match: BadmintonFixture; color: string 
       </div>
     );
   };
-
-  const datePart = (match.Date || "").split(" - ")[0] || "";
-  const timePart = (match.Date || "").split(" - ")[1] || "";
 
   return (
     <div className="w-[200px] sm:w-[230px] bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden shrink-0">
@@ -94,11 +93,9 @@ function buildRounds(fixtures: BadmintonFixture[]) {
   });
 
   if (maxDepth === -1) {
-    // Fallback: all unknowns, just stack as single round
     return [{ depth: 0, matches: fixtures, ...stageFor(0) }];
   }
 
-  // Assign unknowns to rounds beyond maxDepth
   if (unknowns.length > 0) {
     const remaining = [...unknowns];
     while (remaining.length > 0) {
@@ -117,12 +114,15 @@ function buildRounds(fixtures: BadmintonFixture[]) {
   return rounds;
 }
 
-/* ── match group for "all matches" view ──────────────── */
+/* ── match group for "all matches" & search view ─────────── */
 
-function MatchGroup({ label, matches }: { label: string; matches: BadmintonFixture[] }) {
+function MatchGroup({ label, matches, highlightQuery }: { label: string; matches: BadmintonFixture[]; highlightQuery?: string }) {
   return (
     <div>
-      <h4 className="text-xs font-bold text-gray-700 mb-2 pl-1">{label}</h4>
+      <h4 className="text-xs font-bold text-gray-700 mb-2 pl-1 flex items-center justify-between">
+        <span>{label}</span>
+        <span className="text-[10px] text-gray-400 font-normal">{matches.length} {matches.length === 1 ? "match" : "matches"}</span>
+      </h4>
       <div className="flex flex-col gap-2.5">
         {matches.map((match, idx) => {
           const done = isCompleted(match.Status);
@@ -145,6 +145,8 @@ function MatchGroup({ label, matches }: { label: string; matches: BadmintonFixtu
                   <span className="text-[10px] font-bold text-gray-500 shrink-0">{time}</span>
                   <span className="text-[10px] text-gray-300">·</span>
                   <span className="text-[10px] font-semibold text-gray-700 truncate">{match["Match Name"]}</span>
+                  <span className="text-[10px] text-gray-300 shrink-0">·</span>
+                  <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded shrink-0">{match.Category}</span>
                 </div>
                 {live ? (
                   <span className="text-[10px] font-extrabold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 animate-pulse shrink-0">🔴 LIVE</span>
@@ -160,9 +162,13 @@ function MatchGroup({ label, matches }: { label: string; matches: BadmintonFixtu
                   {(["Team A", "Team B"] as const).map(key => {
                     const name = ((key === "Team A" ? match["Team A"] : match["Team B"]) || "TBD").trim();
                     const won = done && winner === norm(name) && norm(name) !== "" && norm(name) !== "tbd";
+                    const isHighlighted = highlightQuery && norm(name).includes(norm(highlightQuery));
+
                     return (
-                      <div key={key} className={`flex items-center justify-between px-4 py-3 text-sm ${won ? "font-bold text-gray-900" : "text-gray-600"}`}>
-                        <span className="truncate pr-3">{name}</span>
+                      <div key={key} className={`flex items-center justify-between px-4 py-3 text-sm transition-colors ${
+                        won ? "font-bold text-gray-900" : "text-gray-600"
+                      } ${isHighlighted ? "bg-amber-50/70" : ""}`}>
+                        <span className={`truncate pr-3 ${isHighlighted ? "text-amber-900 font-extrabold" : ""}`}>{name}</span>
                         {won && <span className="shrink-0 ml-1 text-amber-500">🏆</span>}
                       </div>
                     );
@@ -205,14 +211,27 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
   }, [displayFixtures]);
 
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  /* ── search filter ───────────────────────────────────── */
+  const searchedMatches = useMemo(() => {
+    const q = norm(searchQuery);
+    if (!q) return [];
+    return displayFixtures.filter(f => norm(f["Team A"]).includes(q) || norm(f["Team B"]).includes(q));
+  }, [displayFixtures, searchQuery]);
+
+  const searchedGrouped = useMemo(() => {
+    if (searchedMatches.length === 0) return { upcoming: [], completed: [] };
+    const completed = searchedMatches.filter(f => isCompleted(f.Status) || isLive(f.Status));
+    const upcoming = searchedMatches.filter(f => !isCompleted(f.Status) && !isLive(f.Status));
+    return { upcoming, completed };
+  }, [searchedMatches]);
 
   /* ── all-matches: completed first, grouped by category ─── */
   const byCategory = useMemo(() => {
-    // Split into completed/live and upcoming
     const completed = displayFixtures.filter(f => isCompleted(f.Status) || isLive(f.Status));
     const upcoming = displayFixtures.filter(f => !isCompleted(f.Status) && !isLive(f.Status));
 
-    // Group each by category
     const group = (arr: BadmintonFixture[]) => {
       const g: Record<string, BadmintonFixture[]> = {};
       arr.forEach(f => {
@@ -245,35 +264,60 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
         <p className="text-xs text-gray-400 mb-4">Sample data — connect your Google Sheet to go live</p>
       )}
 
-      {/* ─── Tab bar ─── */}
-      <div className="w-full max-w-3xl flex gap-2 overflow-x-auto pb-2 mb-6 px-4 no-scrollbar">
-        <button
-          onClick={() => setActiveTab("all")}
-          className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-            activeTab === "all"
-              ? "bg-[var(--color-onam-orange)] text-white border-transparent shadow-sm"
-              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-          }`}
-        >
-          All Matches
-        </button>
-        {categories.map(cat => (
+      {/* ─── Player Search Bar ─── */}
+      <div className="w-full max-w-md px-4 mb-5 relative">
+        <div className="relative flex items-center">
+          <span className="absolute left-3.5 text-gray-400 text-xs sm:text-sm">🔍</span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search player name... (e.g. Sajith, Mithun)"
+            className="w-full bg-white border border-gray-200 rounded-full pl-9 pr-9 py-2 text-xs sm:text-sm shadow-xs focus:outline-none focus:border-[var(--color-onam-orange)] focus:ring-1 focus:ring-[var(--color-onam-orange)] transition-all placeholder:text-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3.5 text-gray-400 hover:text-gray-600 text-[10px] font-bold bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Tab bar (Hidden during active search) ─── */}
+      {!searchQuery.trim() && (
+        <div className="w-full max-w-3xl flex gap-2 overflow-x-auto pb-2 mb-6 px-4 no-scrollbar">
           <button
-            key={cat}
-            onClick={() => setActiveTab(cat)}
+            onClick={() => setActiveTab("all")}
             className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-              activeTab === cat
+              activeTab === "all"
                 ? "bg-[var(--color-onam-orange)] text-white border-transparent shadow-sm"
                 : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
             }`}
           >
-            {cat}
+            All Matches
           </button>
-        ))}
-      </div>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveTab(cat)}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                activeTab === cat
+                  ? "bg-[var(--color-onam-orange)] text-white border-transparent shadow-sm"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ─── Rules link ─── */}
-      {rulesUrl && (
+      {rulesUrl && !searchQuery.trim() && (
         <div className="mb-6 text-center">
           <a href={rulesUrl} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs font-bold text-[#7a5c00] bg-[#fffaf0] border border-[#f5e6cc] px-4 py-2 rounded-full hover:bg-amber-100 transition-colors">
@@ -283,9 +327,59 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
       )}
 
       {/* ════════════════════════════════════════════════
+          SEARCH RESULTS VIEW
+          ════════════════════════════════════════════════ */}
+      {searchQuery.trim() !== "" && (
+        <div className="w-full max-w-2xl px-4 flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+            <div>
+              <h3 className="text-sm font-black text-gray-800">
+                Matches for &quot;<span className="text-[var(--color-onam-orange)]">{searchQuery}</span>&quot;
+              </h3>
+              <p className="text-[11px] text-gray-400">Showing matches where player is participating</p>
+            </div>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 hover:bg-amber-100 transition-colors"
+            >
+              Clear Search
+            </button>
+          </div>
+
+          {searchedMatches.length === 0 ? (
+            <div className="text-center py-10 bg-white rounded-2xl border border-gray-200 p-6 shadow-xs">
+              <span className="text-3xl">🔍</span>
+              <p className="text-sm font-bold text-gray-700 mt-2">No matches found for &quot;{searchQuery}&quot;</p>
+              <p className="text-xs text-gray-400 mt-1">Check the spelling or try searching first/last name.</p>
+            </div>
+          ) : (
+            <>
+              {/* Upcoming Matches First for Player */}
+              {searchedGrouped.upcoming.length > 0 && (
+                <MatchGroup
+                  label="⏳ Upcoming Player Matches"
+                  matches={searchedGrouped.upcoming}
+                  highlightQuery={searchQuery}
+                />
+              )}
+
+              {/* Completed Results for Player */}
+              {searchedGrouped.completed.length > 0 && (
+                <MatchGroup
+                  label="✓ Completed Player Results"
+                  matches={searchedGrouped.completed}
+                  highlightQuery={searchQuery}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════
           ALL MATCHES — completed first, by category
           ════════════════════════════════════════════════ */}
-      {activeTab === "all" && (
+      {!searchQuery.trim() && activeTab === "all" && (
         <div className="w-full max-w-2xl px-4 flex flex-col gap-6">
           {/* Completed / Live results */}
           {Object.keys(byCategory.completed).length > 0 && (
@@ -320,7 +414,7 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
       {/* ════════════════════════════════════════════════
           CATEGORY — tournament bracket
           ════════════════════════════════════════════════ */}
-      {activeTab !== "all" && (
+      {!searchQuery.trim() && activeTab !== "all" && (
         <div className="w-full flex flex-col items-center">
           {/* Champion banner */}
           {champion && (
