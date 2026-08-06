@@ -21,7 +21,7 @@ export async function fetchSheetData<T>(sheetName: string): Promise<T[]> {
   try {
     const response = await fetch(url, { 
       cache: "no-store",
-      signal: AbortSignal.timeout(4000)
+      signal: AbortSignal.timeout(10000)
     }); // Always fetch live sheet data immediately without caching
     if (!response.ok) {
       throw new Error(`Failed to fetch sheet: ${sheetName}`);
@@ -113,8 +113,10 @@ export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
 
 export async function getBadmintonFixtures(): Promise<BadmintonFixture[]> {
   const data = await fetchSheetData<BadmintonFixture>("Badminton");
-  return data
-    .filter(row => String(row.Active || "").trim().toUpperCase() === "TRUE");
+  return data.filter(row => {
+    if (row.Active === undefined || row.Active === null || String(row.Active).trim() === "") return true;
+    return String(row.Active).trim().toUpperCase() === "TRUE";
+  });
 }
 
 export async function getSponsors(): Promise<Sponsor[]> {

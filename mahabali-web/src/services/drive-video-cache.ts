@@ -58,7 +58,7 @@ export async function preloadVideoClips(): Promise<{ cachedCount: number; total:
   try {
     // 1. Fetch latest files dynamically from Apps Script endpoint to pick up any new Drive uploads
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
-    const res = await fetch(scriptUrl, { signal: AbortSignal.timeout(4000) }).catch(() => null);
+    const res = await fetch(scriptUrl, { signal: AbortSignal.timeout(10000) }).catch(() => null);
     
     if (res && res.ok) {
       const data = await res.json().catch(() => null);

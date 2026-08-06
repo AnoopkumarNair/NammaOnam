@@ -4,7 +4,7 @@ export async function getDriveAssetsMap(): Promise<Map<string, string>> {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
     const res = await fetch(scriptUrl, { 
       next: { revalidate: 60 },
-      signal: AbortSignal.timeout(4000) 
+      signal: AbortSignal.timeout(10000) 
     });
     
     if (!res.ok) return new Map();
