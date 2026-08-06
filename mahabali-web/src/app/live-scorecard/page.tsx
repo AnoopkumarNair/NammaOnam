@@ -60,12 +60,12 @@ export default function LiveScorecardTVPage() {
     return () => unsubscribe();
   }, []);
 
-  // Auto-dismiss action video after 4 seconds
+  // Auto-dismiss action video after 7 seconds
   useEffect(() => {
     if (activeVideo) {
       const timer = setTimeout(() => {
         setActiveVideo(null);
-      }, 4000);
+      }, 7000);
       return () => clearTimeout(timer);
     }
   }, [activeVideo]);
@@ -353,16 +353,35 @@ export default function LiveScorecardTVPage() {
               </span>
             </div>
 
-            {/* Video Player */}
-            <video
-              ref={videoRef}
-              src={activeVideo.url}
-              autoPlay
-              playsInline
-              muted={isMuted}
-              className="w-full h-full object-cover"
-              onEnded={() => setActiveVideo(null)}
-            />
+            {/* Video Player / Google Drive Embed */}
+            {(() => {
+              const url = activeVideo.url || "";
+              const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
+              const driveId = idMatch ? idMatch[1] : null;
+
+              if (driveId) {
+                return (
+                  <iframe
+                    src={`https://drive.google.com/file/d/${driveId}/preview?autoplay=1`}
+                    className="w-full h-full border-0 rounded-2xl bg-black"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    title={activeVideo.title}
+                  />
+                );
+              }
+
+              return (
+                <video
+                  ref={videoRef}
+                  src={activeVideo.url}
+                  autoPlay
+                  playsInline
+                  muted={isMuted}
+                  className="w-full h-full object-cover"
+                  onEnded={() => setActiveVideo(null)}
+                />
+              );
+            })()}
           </div>
         </div>
       )}
