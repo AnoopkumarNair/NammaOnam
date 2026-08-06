@@ -1,0 +1,143 @@
+import { ActionCategory, ActionClip } from "@/types/scorecard";
+
+// Direct Google Drive direct stream URLs for all 17 uploaded Badminton Scorecard videos
+const DRIVE_RAW_CLIPS: Record<string, ActionClip[]> = {
+  power: [
+    { id: "power-boom", category: "power", title: "💥 BOOM! Thunderbolt Smash", url: "https://drive.google.com/uc?export=download&id=1HMOaE_Uv6vok1-zt-3jEHAlEhef5zzrT" },
+    { id: "power-power", category: "power", title: "💥 Maximum Power Attack", url: "https://drive.google.com/uc?export=download&id=1ajLNPS2xgMouJY25znFEujzC84O5v0Do" },
+    { id: "power-unstoppable", category: "power", title: "💥 Unstoppable Hammer Smash", url: "https://drive.google.com/uc?export=download&id=1zPesbHFVffuPzxTA3iqRmzbroI_hu8Iz" },
+  ],
+  precision: [
+    { id: "precision-pinpoint", category: "precision", title: "🎯 Pinpoint Drop Shot", url: "https://drive.google.com/uc?export=download&id=1K0MzoqtMLW5oxlN0aoeDbDVJOJiYV3Mn" },
+    { id: "precision-perfect", category: "precision", title: "🎯 Picture Perfect Corner Placement", url: "https://drive.google.com/uc?export=download&id=1m0aIuWJd0dAfhcv3DoFBZIH9q7m-GZ4c" },
+    { id: "precision-bullseye", category: "precision", title: "🎯 Bullseye Hairpin Net Drop", url: "https://drive.google.com/uc?export=download&id=1dl5zBBSLVL6iCPciasPuh-06fSIPWgzi" },
+  ],
+  funny: [
+    { id: "funny-surprise", category: "funny", title: "🤪 Surprising Out-of-Bounds!", url: "https://drive.google.com/uc?export=download&id=12UImeouJ2eXd1JX0dHbBz0t7GFZOY5eR" },
+    { id: "funny-whoa", category: "funny", title: "🤪 Whoa! Wild Mishit", url: "https://drive.google.com/uc?export=download&id=1YRkKniWSumJsKq7aOOQfRA2A2XLo0BE4" },
+    { id: "funny-boing", category: "funny", title: "🤪 Boing! Net Clip Wobble", url: "https://drive.google.com/uc?export=download&id=1DV91naue3pKivI3Aa8ZRPdo6ebUCVNiv" },
+  ],
+  epic: [
+    { id: "epic-legendary", category: "epic", title: "⚡ Legendary Rally exchange!", url: "https://drive.google.com/uc?export=download&id=1cHZudasr4Jk4maSwgU1Pzzn-GvvIWO4f" },
+    { id: "epic-toofast", category: "epic", title: "⚡ Lightning Fast Reflexes", url: "https://drive.google.com/uc?export=download&id=1zTq11pKIGN5Z1aQXeZAsPQ7uvhHCxuTU" },
+    { id: "epic-epic", category: "epic", title: "⚡ Epic Marathon Rally!", url: "https://drive.google.com/uc?export=download&id=1-VGIoGrU88IY-6AqqYtPuK_95V2fhjaA" },
+  ],
+  celebrate: [
+    { id: "celebrate-glorious", category: "celebrate", title: "🏆 Glorious Winner Point!", url: "https://drive.google.com/uc?export=download&id=11p5ru-DqaFDUezQqQwHKt2NUCpAp8r2y" },
+    { id: "celebrate-magnificent", category: "celebrate", title: "🏆 Magnificent Point Celebration", url: "https://drive.google.com/uc?export=download&id=1O_eLPNmoCorcnfyqlaZP-n6VbVP_6VcE" },
+    { id: "celebrate-bravo", category: "celebrate", title: "🏆 Bravo! Masterclass Finish", url: "https://drive.google.com/uc?export=download&id=1QPCyX1VqvW0Isl9O9sYd0SQ4wBMGVvA7" },
+  ],
+  bonus: [
+    { id: "bonus-nice", category: "bonus", title: "✨ Nice Trick Shot!", url: "https://drive.google.com/uc?export=download&id=1VA17psnGQboa3t2jkwtAwl1U2LA_2Tj7" },
+    { id: "bonus-unbelievable", category: "bonus", title: "✨ Unbelievable Bonus Point!", url: "https://drive.google.com/uc?export=download&id=1aiTvhuhH8Ys8FlSoxfw6Ykr047G2YJcS" },
+  ],
+};
+
+// Aliases for legacy categories
+DRIVE_RAW_CLIPS.smash = DRIVE_RAW_CLIPS.power;
+DRIVE_RAW_CLIPS.out = DRIVE_RAW_CLIPS.funny;
+DRIVE_RAW_CLIPS.placement = DRIVE_RAW_CLIPS.precision;
+DRIVE_RAW_CLIPS.rally = DRIVE_RAW_CLIPS.epic;
+DRIVE_RAW_CLIPS.ace = DRIVE_RAW_CLIPS.celebrate;
+
+// Dynamic runtime store that gets updated if Google Drive introduces new files
+let activeClipsStore: Record<string, ActionClip[]> = { ...DRIVE_RAW_CLIPS };
+
+// Track last played video per category so no video plays twice in a row
+const lastPlayedMap = new Map<string, string>();
+
+const CACHE_NAME = 'badminton-video-clips-cache-v2';
+
+/**
+ * Background preloader: Pulls fresh Google Drive list & caches all video MP4 files into CacheStorage
+ */
+export async function preloadVideoClips(): Promise<{ cachedCount: number; total: number }> {
+  let cachedCount = 0;
+  let total = 0;
+
+  try {
+    // 1. Fetch latest files dynamically from Apps Script endpoint to pick up any new Drive uploads
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
+    const res = await fetch(scriptUrl, { signal: AbortSignal.timeout(4000) }).catch(() => null);
+    
+    if (res && res.ok) {
+      const data = await res.json().catch(() => null);
+      if (data && data.files && Array.isArray(data.files)) {
+        data.files.forEach((file: { name: string; id: string }) => {
+          if (!file.name || !file.id || !file.name.toLowerCase().endsWith('.mp4')) return;
+          
+          const prefix = file.name.split('_')[0].toLowerCase();
+          if (['power', 'precision', 'funny', 'epic', 'celebrate', 'bonus'].includes(prefix)) {
+            if (!activeClipsStore[prefix]) activeClipsStore[prefix] = [];
+            const fileUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
+            const exists = activeClipsStore[prefix].some(c => c.url === fileUrl || c.id === file.id);
+            
+            if (!exists) {
+              const cleanTitle = file.name.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+              activeClipsStore[prefix].push({
+                id: file.id,
+                category: prefix as ActionCategory,
+                title: cleanTitle,
+                url: fileUrl
+              });
+            }
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Dynamic Drive video lookup fallback to static clips:", err);
+  }
+
+  // 2. Cache all MP4s into browser CacheStorage for 100% offline local TV playback
+  if (typeof window !== 'undefined' && 'caches' in window) {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const categories = Object.keys(activeClipsStore);
+
+      for (const cat of categories) {
+        const clips = activeClipsStore[cat] || [];
+        total += clips.length;
+        for (const clip of clips) {
+          try {
+            const match = await cache.match(clip.url);
+            if (!match) {
+              await cache.add(clip.url).catch(() => {});
+            }
+            cachedCount++;
+          } catch (e) {
+            // Ignore single video fetch failures
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("CacheStorage preloading error:", e);
+    }
+  }
+
+  return { cachedCount, total };
+}
+
+/**
+ * Returns a random clip for category guaranteed to NEVER repeat the same video twice in a row
+ */
+export function getRandomClipForCategory(category: ActionCategory): ActionClip {
+  const catKey = String(category).toLowerCase();
+  const clips = activeClipsStore[catKey] || activeClipsStore.power || DRIVE_RAW_CLIPS.power;
+  
+  if (!clips || clips.length === 0) {
+    return DRIVE_RAW_CLIPS.power[0];
+  }
+
+  if (clips.length === 1) {
+    return clips[0];
+  }
+
+  const lastId = lastPlayedMap.get(catKey);
+  const eligibleClips = clips.filter(c => c.id !== lastId);
+  const randomIndex = Math.floor(Math.random() * eligibleClips.length);
+  const selected = eligibleClips[randomIndex] || clips[0];
+
+  lastPlayedMap.set(catKey, selected.id);
+  return selected;
+}
