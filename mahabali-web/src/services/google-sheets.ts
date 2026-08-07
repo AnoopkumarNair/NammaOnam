@@ -72,18 +72,30 @@ function resolveAssetUrl(url: string | undefined, driveAssets: Map<string, strin
   const trimmed = url.trim();
   if (!trimmed) return url;
 
-  // 1. Direct http/https URL or relative path (/assets/...) from Column F
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
-    const idMatch = trimmed.match(/[?&]id=([^&]+)/) || trimmed.match(/\/file\/d\/([^/]+)/);
-    if (idMatch && idMatch[1]) {
-      return `https://lh3.googleusercontent.com/d/${idMatch[1]}=w1000`;
+  // 1. Full Google Drive URL — extract file ID and convert to CDN thumbnail URL
+  const idMatch = trimmed.match(/[?&]id=([^&]+)/) || trimmed.match(/\/file\/d\/([^/]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}=w1000`;
+  }
+
+  // 2. Relative /assets/... path — look up actual file by filename in driveAssets
+  if (trimmed.startsWith("/assets/") || trimmed.startsWith("assets/")) {
+    const filename = trimmed.split('/').pop() || "";
+    if (filename && driveAssets.has(filename)) {
+      return driveAssets.get(filename);
     }
+    // No match in Drive — return as-is (will 404 if file not in public/assets/)
     return trimmed;
   }
 
-  // 2. Filename lookup in driveAssets map
+  // 3. Plain https/http URL — return directly
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // 4. Bare filename — look up in driveAssets map
   const filename = trimmed.split('/').pop() || "";
-  if (driveAssets.has(filename)) {
+  if (filename && driveAssets.has(filename)) {
     return driveAssets.get(filename);
   }
 
