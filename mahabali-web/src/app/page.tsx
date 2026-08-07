@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
+import Link from "next/link";
+import { Trophy } from "lucide-react";
 import { BadmintonBracket } from "@/components/ui/badminton-bracket";
 import { CommitteeGrid } from "@/components/ui/committee-grid";
 import { CulturalTimeline } from "@/components/ui/cultural-timeline";
@@ -388,6 +390,19 @@ export default async function Home() {
 
       <FloatingNilavilakku />
       <MaveliWidget initialMessage={`Welcome to ${title}.`} />
+      
+      {/* 🏸 Mobile Floating Quick Links FAB */}
+      <div className="fixed bottom-5 right-5 z-40 md:hidden">
+        <Link
+          href="/live-scorecard"
+          target="_blank"
+          className="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 font-black px-4 py-3 rounded-full shadow-2xl border-2 border-white animate-bounce text-xs tracking-wider uppercase"
+        >
+          <Trophy className="w-4 h-4 fill-slate-950" />
+          <span>Live Scores ↗</span>
+        </Link>
+      </div>
+
       <Footer committee={committee} config={config} />
     </PageTransition>
   );

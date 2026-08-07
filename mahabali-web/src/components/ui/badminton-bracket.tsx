@@ -260,8 +260,50 @@ export function BadmintonBracket({ fixtures, rulesUrl }: BadmintonBracketProps) 
   return (
     <div className="w-full flex flex-col items-center pb-8">
 
+      {/* ─── Live Scorecard & Scorekeeper Action Bar ─── */}
+      <div className="w-full max-w-md px-4 mb-4 flex items-center justify-between gap-3">
+        <a
+          href="/live-scorecard"
+          target="_blank"
+          className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold px-4 py-2.5 rounded-full text-xs shadow-md transition-all animate-pulse"
+        >
+          <span>📺 Live TV Scorecard</span>
+        </a>
+        <a
+          href="/score-setter"
+          target="_blank"
+          className="inline-flex items-center justify-center gap-1 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-3.5 py-2.5 rounded-full text-xs border border-slate-700 shadow-sm transition-all"
+          title="Scorekeeper PIN Access"
+        >
+          <span>🔒 Score Control</span>
+        </a>
+      </div>
       {!hasData && (
         <p className="text-xs text-gray-400 mb-4">Sample data — connect your Google Sheet to go live</p>
+      )}
+
+      {/* ─── Tournament Stats Summary Bar ─── */}
+      {hasData && (
+        <div className="w-full max-w-3xl grid grid-cols-3 gap-2 sm:gap-4 px-4 mb-5">
+          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200 p-3 rounded-2xl text-center shadow-xs">
+            <span className="text-[10px] sm:text-xs font-extrabold uppercase text-emerald-800 tracking-wider">Done Matches</span>
+            <p className="text-base sm:text-2xl font-black text-emerald-900 mt-0.5">
+              {displayFixtures.filter(f => isCompleted(f.Status)).length} <span className="text-xs font-bold text-emerald-700">/ {displayFixtures.length}</span>
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-amber-50 to-amber-100/60 border border-amber-200 p-3 rounded-2xl text-center shadow-xs">
+            <span className="text-[10px] sm:text-xs font-extrabold uppercase text-amber-800 tracking-wider">Upcoming</span>
+            <p className="text-base sm:text-2xl font-black text-amber-900 mt-0.5">
+              {displayFixtures.filter(f => !isCompleted(f.Status) && !isLive(f.Status)).length}
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/60 border border-indigo-200 p-3 rounded-2xl text-center shadow-xs">
+            <span className="text-[10px] sm:text-xs font-extrabold uppercase text-indigo-800 tracking-wider">Categories</span>
+            <p className="text-base sm:text-2xl font-black text-indigo-900 mt-0.5">
+              {new Set(displayFixtures.map(f => f.Category).filter(Boolean)).size}
+            </p>
+          </div>
+        </div>
       )}
 
       {/* ─── Player Search Bar ─── */}
