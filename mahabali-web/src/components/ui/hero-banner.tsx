@@ -94,6 +94,8 @@ export function HeroBanner({
 }: HeroBannerProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
+  const [isFestivalPast, setIsFestivalPast] = useState(false);
+
   useEffect(() => {
     const tick = () => {
       let parsedTime = new Date(targetDate).getTime();
@@ -110,6 +112,7 @@ export function HeroBanner({
 
       const diff = parsedTime - Date.now();
       if (!isNaN(diff) && diff > 0) {
+        setIsFestivalPast(false);
         setTimeLeft({
           days: Math.floor(diff / 86400000),
           hours: Math.floor((diff / 3600000) % 24),
@@ -117,6 +120,7 @@ export function HeroBanner({
           seconds: Math.floor((diff / 1000) % 60),
         });
       } else {
+        setIsFestivalPast(true);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
@@ -216,10 +220,24 @@ export function HeroBanner({
           transition={{ duration: 1, delay: 1 }}
           className="flex justify-center gap-2.5 md:gap-6 mt-8 md:mt-12"
         >
-          <CountdownUnit value={timeLeft.days} label="Days" />
-          <CountdownUnit value={timeLeft.hours} label="Hours" />
-          <CountdownUnit value={timeLeft.minutes} label="Mins" />
-          <CountdownUnit value={timeLeft.seconds} label="Secs" />
+          {isFestivalPast ? (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-4xl md:text-6xl">🎉</span>
+              <span
+                className="text-lg md:text-2xl font-black tracking-wide text-center"
+                style={{ color: "#FFD700", textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
+              >
+                Festival is here!
+              </span>
+            </div>
+          ) : (
+            <>
+              <CountdownUnit value={timeLeft.days} label="Days" />
+              <CountdownUnit value={timeLeft.hours} label="Hours" />
+              <CountdownUnit value={timeLeft.minutes} label="Mins" />
+              <CountdownUnit value={timeLeft.seconds} label="Secs" />
+            </>
+          )}
         </motion.div>
 
         <motion.div

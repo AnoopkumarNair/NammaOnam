@@ -287,7 +287,8 @@ export default async function Home() {
   ]);
 
   const title = getText(config["Festival Name"]) || "Namma Onam 2.0";
-  const targetDate = getText(config["Countdown Date"]) || "2026-08-15T08:00:00";
+  // Festival date is Aug 15 2026. The sheet has a known typo (09-15 vs 08-15), so we use the correct date directly.
+  const targetDate = "2026-08-15T08:00:00";
   const eventDateLabel = getText(config["Event Dates"]) || getText(config["Event Date Label"]) || "August 15 & 16, 2026";
   const subtitle = getText(config["Hero Subtitle"]);
   const registrationHref =
