@@ -69,26 +69,22 @@ export async function getActivities(): Promise<Activity[]> {
 
 function resolveAssetUrl(url: string | undefined, driveAssets: Map<string, string>): string | undefined {
   if (!url || typeof url !== 'string') return url;
+  const trimmed = url.trim();
+  if (!trimmed) return url;
 
-  // 1. Direct Drive URL check
-  const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
-  if (idMatch && idMatch[1]) {
-    return `https://lh3.googleusercontent.com/d/${idMatch[1]}=w1000`;
+  // 1. Direct http/https URL or relative path (/assets/...) from Column F
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+    const idMatch = trimmed.match(/[?&]id=([^&]+)/) || trimmed.match(/\/file\/d\/([^/]+)/);
+    if (idMatch && idMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${idMatch[1]}=w1000`;
+    }
+    return trimmed;
   }
 
-  // 2. Exact filename match
-  const filename = url.split('/').pop() || "";
+  // 2. Filename lookup in driveAssets map
+  const filename = trimmed.split('/').pop() || "";
   if (driveAssets.has(filename)) {
     return driveAssets.get(filename);
-  }
-
-  // 3. Fuzzy filename match (ignore extension & case)
-  const baseName = filename.replace(/\.[^/.]+$/, "").trim().toLowerCase();
-  for (const [driveFileName, driveUrl] of driveAssets.entries()) {
-    const driveBaseName = driveFileName.replace(/\.[^/.]+$/, "").trim().toLowerCase();
-    if (driveBaseName === baseName || (baseName && driveBaseName.includes(baseName))) {
-      return driveUrl;
-    }
   }
 
   return url;

@@ -15,7 +15,16 @@ export default function LiveScorecardTVPage() {
   const [state, setState] = useState<LiveScoreState | null>(null);
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [upcomingMatches, setUpcomingMatches] = useState<BadmintonFixture[]>([]);
-  const [activeVideo, setActiveVideo] = useState<{ url: string; title: string; category: string } | null>(null);
+  const [activeVideo, setActiveVideo] = useState<{ 
+    url: string; 
+    title: string; 
+    category: string;
+    pointToTeam?: string;
+    teamA?: string;
+    teamB?: string;
+    scoreA?: number;
+    scoreB?: number;
+  } | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -35,10 +44,17 @@ export default function LiveScorecardTVPage() {
         lastActionTimestampRef.current = newState.lastAction.timestamp;
         
         const clip = getRandomClipForCategory(newState.lastAction.category);
+        const pointTeamName = newState.lastAction.team === 'A' ? newState.teamA : newState.teamB;
+
         setActiveVideo({
           url: newState.lastAction.clipUrl || clip.url,
           title: clip.title,
-          category: newState.lastAction.category.toUpperCase()
+          category: newState.lastAction.category.toUpperCase(),
+          pointToTeam: pointTeamName,
+          teamA: newState.teamA,
+          teamB: newState.teamB,
+          scoreA: newState.scoreA,
+          scoreB: newState.scoreB
         });
       }
     });
@@ -325,22 +341,29 @@ export default function LiveScorecardTVPage() {
         </div>
       )}
 
-      {/* Triggered Comical Action Video Overlay */}
-      {activeVideo && !state.winner && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300 p-8">
-          <div className="relative max-w-4xl w-full aspect-video rounded-3xl overflow-hidden border-4 border-amber-500 shadow-2xl bg-slate-950 flex flex-col items-center justify-center">
-            {/* Action Header Banner */}
-            <div className="absolute top-0 inset-x-0 bg-gradient-to-b from-black/80 to-transparent p-6 z-10 flex justify-between items-center">
-              <span className="bg-amber-500 text-slate-950 font-black px-4 py-1.5 rounded-full text-base tracking-widest uppercase shadow-xl flex items-center gap-2">
-                <Zap className="w-5 h-5 fill-slate-950" />
-                {activeVideo.category}!
-              </span>
-              <span className="text-white/80 font-bold text-lg drop-shadow-md">
+      {/* 📺 Full-Screen TV Broadcast Instant Replay Overlay */}
+      {activeVideo && !state?.winner && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center animate-in fade-in duration-300 overflow-hidden">
+          <div className="relative w-full h-full flex flex-col justify-between">
+            
+            {/* 🔴 Top Broadcast Header Bar */}
+            <div className="absolute top-0 inset-x-0 bg-gradient-to-b from-black/90 via-black/50 to-transparent p-6 z-20 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-2 bg-red-600 text-white font-black px-4 py-1.5 rounded-full text-xs md:text-sm tracking-widest uppercase shadow-xl animate-pulse">
+                  <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
+                  🔴 LIVE REPLAY
+                </span>
+                <span className="bg-amber-500 text-slate-950 font-black px-4 py-1.5 rounded-full text-xs md:text-sm tracking-widest uppercase shadow-xl flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 fill-slate-950" />
+                  {activeVideo.category}
+                </span>
+              </div>
+              <span className="text-white/90 font-bold text-sm md:text-base drop-shadow-md hidden sm:inline">
                 {activeVideo.title}
               </span>
             </div>
 
-            {/* Video Player / Google Drive Embed */}
+            {/* Video Content */}
             {(() => {
               const url = activeVideo.url || "";
               const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
@@ -350,7 +373,7 @@ export default function LiveScorecardTVPage() {
                 return (
                   <iframe
                     src={`https://drive.google.com/file/d/${driveId}/preview?autoplay=1`}
-                    className="w-full h-full border-0 rounded-2xl bg-black"
+                    className="w-full h-full border-0 bg-black pointer-events-none"
                     allow="autoplay; encrypted-media; picture-in-picture"
                     title={activeVideo.title}
                   />
@@ -369,6 +392,32 @@ export default function LiveScorecardTVPage() {
                 />
               );
             })()}
+
+            {/* 🎾 Bottom TV Sports Lower-Third Overlay Graphic */}
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/90 to-transparent p-6 sm:p-10 z-20 flex flex-col items-center gap-3">
+              {/* POINT TO RECIPIENT BANNER */}
+              {activeVideo.pointToTeam && (
+                <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 px-8 py-3 rounded-full shadow-2xl animate-bounce flex items-center gap-3 border-2 border-amber-300">
+                  <Sparkles className="w-6 h-6 fill-slate-950 text-slate-950" />
+                  <span className="text-sm md:text-xl font-black tracking-wider uppercase">
+                    POINT TO: {activeVideo.pointToTeam}
+                  </span>
+                  <Sparkles className="w-6 h-6 fill-slate-950 text-slate-950" />
+                </div>
+              )}
+
+              {/* LIVE SCORE TICKER */}
+              {activeVideo.teamA && activeVideo.teamB && (
+                <div className="flex items-center gap-4 bg-slate-950/80 border border-slate-700/80 px-6 py-2 rounded-2xl backdrop-blur-md shadow-xl text-xs md:text-sm font-black">
+                  <span className="text-slate-300">{activeVideo.teamA}</span>
+                  <span className="bg-amber-500 text-slate-950 px-3 py-1 rounded-lg text-base font-black">
+                    {activeVideo.scoreA ?? 0} - {activeVideo.scoreB ?? 0}
+                  </span>
+                  <span className="text-slate-300">{activeVideo.teamB}</span>
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
       )}
