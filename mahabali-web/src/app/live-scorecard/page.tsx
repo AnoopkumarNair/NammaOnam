@@ -368,35 +368,16 @@ export default function LiveScorecardTVPage() {
               </span>
             </div>
 
-            {/* 100% Reliable Video Player / Google Drive Embed */}
-            {(() => {
-              const url = activeVideo.url || "";
-              const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
-              const driveId = idMatch ? idMatch[1] : null;
-
-              if (driveId) {
-                return (
-                  <iframe
-                    src={`https://drive.google.com/file/d/${driveId}/preview?autoplay=1`}
-                    className="w-full h-full border-0 bg-black pointer-events-none scale-105"
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    title={activeVideo.title}
-                  />
-                );
-              }
-
-              return (
-                <video
-                  ref={videoRef}
-                  src={activeVideo.url}
-                  autoPlay
-                  playsInline
-                  muted={isMuted}
-                  className="w-full h-full object-cover pointer-events-none"
-                  onEnded={() => setActiveVideo(null)}
-                />
-              );
-            })()}
+            {/* Instant 0ms HTML5 Video Player */}
+            <video
+              ref={videoRef}
+              src={getFastVideoUrl(activeVideo.url)}
+              autoPlay
+              playsInline
+              muted={isMuted}
+              className="w-full h-full object-cover pointer-events-none"
+              onEnded={() => setActiveVideo(null)}
+            />
 
             {/* 🎾 Bottom TV Sports Lower-Third Overlay Graphic */}
             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/90 to-transparent p-6 sm:p-10 z-20 flex flex-col items-center gap-3">
