@@ -86,6 +86,23 @@ export default function LiveScorecardTVPage() {
     return () => unsubscribe();
   }, []);
 
+  // Ensure video playback starts smoothly & falls back to muted if browser blocks unmuted autoplay
+  useEffect(() => {
+    if (activeVideo && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Autoplay blocked by browser policy, attempting muted playback:", err);
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(console.error);
+          }
+        });
+      }
+    }
+  }, [activeVideo]);
+
   // Auto-dismiss action video after 7 seconds
   useEffect(() => {
     if (activeVideo) {
@@ -375,6 +392,7 @@ export default function LiveScorecardTVPage() {
               autoPlay
               playsInline
               muted={isMuted}
+              preload="auto"
               className="w-full h-full object-cover pointer-events-none"
               onEnded={() => setActiveVideo(null)}
             />
