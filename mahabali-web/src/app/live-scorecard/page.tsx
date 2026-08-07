@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState, useRef } from "react";
 import { LiveScoreState, ActionCategory, getBadmintonBadge } from "@/types/scorecard";
 import { subscribeToLiveState, updateLiveState, fetchOngoingMatchFromSheets } from "@/services/live-scoreboard";
@@ -18,14 +20,17 @@ export default function LiveScorecardTVPage() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const lastActionTimestampRef = useRef<number>(0);
+  const lastActionTimestampRef = useRef<number>(typeof window !== 'undefined' ? Date.now() : 0);
 
   useEffect(() => {
+    // Set timestamp to current time on mount so old persisted actions don't play video on load
+    lastActionTimestampRef.current = Date.now();
+
     const unsubscribe = subscribeToLiveState((newState) => {
       setState(newState);
       setIsMuted(newState.muted);
 
-      // Check if a new action point was triggered
+      // Check if a new action point was triggered by Score Control
       if (newState.lastAction && newState.lastAction.timestamp > lastActionTimestampRef.current) {
         lastActionTimestampRef.current = newState.lastAction.timestamp;
         
@@ -69,24 +74,6 @@ export default function LiveScorecardTVPage() {
       return () => clearTimeout(timer);
     }
   }, [activeVideo]);
-
-  // Idle Attract Loop: rotate comical clips every 12 seconds when in attract mode
-  useEffect(() => {
-    if (state && (state.displayMode === 'attract' || state.status === 'Idle')) {
-      const categories: Array<ActionCategory> = ['power', 'precision', 'funny', 'epic', 'celebrate', 'bonus'];
-      const interval = setInterval(() => {
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const clip = getRandomClipForCategory(randomCategory);
-        setActiveVideo({
-          url: clip.url,
-          title: clip.title,
-          category: `ATTRACT SHOWCASE: ${randomCategory.toUpperCase()}`
-        });
-      }, 12000);
-
-      return () => clearInterval(interval);
-    }
-  }, [state?.displayMode, state?.status]);
 
   const toggleMute = () => {
     const newMuted = !isMuted;

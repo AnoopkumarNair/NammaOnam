@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import { LiveScoreState, ActionCategory, checkBadmintonSetWinner, getBadmintonBadge } from "@/types/scorecard";
 import { subscribeToLiveState, updateLiveState, fetchOngoingMatchFromSheets } from "@/services/live-scoreboard";

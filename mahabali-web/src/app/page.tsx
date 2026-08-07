@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import { BadmintonBracket } from "@/components/ui/badminton-bracket";
 import { CommitteeGrid } from "@/components/ui/committee-grid";
