@@ -69,8 +69,29 @@ export async function getActivities(): Promise<Activity[]> {
 
 function resolveAssetUrl(url: string | undefined, driveAssets: Map<string, string>): string | undefined {
   if (!url || typeof url !== 'string') return url;
+
+  // 1. Direct Drive URL check
+  const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}=w1000`;
+  }
+
+  // 2. Exact filename match
   const filename = url.split('/').pop() || "";
-  return driveAssets.has(filename) ? driveAssets.get(filename) : url;
+  if (driveAssets.has(filename)) {
+    return driveAssets.get(filename);
+  }
+
+  // 3. Fuzzy filename match (ignore extension & case)
+  const baseName = filename.replace(/\.[^/.]+$/, "").trim().toLowerCase();
+  for (const [driveFileName, driveUrl] of driveAssets.entries()) {
+    const driveBaseName = driveFileName.replace(/\.[^/.]+$/, "").trim().toLowerCase();
+    if (driveBaseName === baseName || (baseName && driveBaseName.includes(baseName))) {
+      return driveUrl;
+    }
+  }
+
+  return url;
 }
 
 export async function getWalkathonLeaderboard(): Promise<WalkathonEntry[]> {
@@ -125,12 +146,19 @@ export async function getSponsors(): Promise<Sponsor[]> {
     getDriveAssetsMap()
   ]);
   return data
-    .filter(row => row.Active === "TRUE")
-    .map(row => ({
-      ...row,
-      "Image URL": resolveAssetUrl(row["Image URL"], driveAssets),
-      "Logo URL": resolveAssetUrl(row["Logo URL"], driveAssets)
-    }))
+    .filter(row => {
+      if (row.Active === undefined || row.Active === null || String(row.Active).trim() === "") return true;
+      return String(row.Active).trim().toUpperCase() === "TRUE";
+    })
+    .map(row => {
+      const rawUrl = row["Logo URL"] || row["Image URL"] || "";
+      const resolved = resolveAssetUrl(rawUrl, driveAssets);
+      return {
+        ...row,
+        "Image URL": resolved,
+        "Logo URL": resolved
+      };
+    })
     .sort((a, b) => (Number(a['Display Order']) || 0) - (Number(b['Display Order']) || 0));
 }
 

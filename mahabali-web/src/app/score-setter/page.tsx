@@ -260,43 +260,52 @@ export default function ScoreSetterAdminPage() {
         </div>
       </header>
 
-      {/* Select Match from Google Sheet Fixtures Dropdown */}
-      {fixtures.length > 0 && (
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-          <span className="text-xs font-black uppercase tracking-widest text-amber-400 shrink-0">
-            🎯 Load Match from Sheet:
-          </span>
-          <select
-            onChange={(e) => {
-              const selected = fixtures.find(f => (f.Id || f["Match Name"]) === e.target.value);
-              if (selected) {
-                const label = selected.Category ? `${selected.Category} · ${selected["Match Name"]}` : selected["Match Name"];
-                updateLiveState({
-                  matchName: label,
-                  teamA: selected["Team A"] || "Team A",
-                  teamB: selected["Team B"] || "Team B",
-                  scoreA: 0,
-                  scoreB: 0,
-                  currentSet: 1,
-                  setHistory: [],
-                  winner: undefined,
-                  status: 'Ongoing',
-                  displayMode: 'live'
-                });
-              }
-            }}
-            defaultValue=""
-            className="w-full sm:w-auto bg-slate-950 text-amber-300 text-xs font-extrabold border border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-400 shadow-inner"
-          >
-            <option value="" disabled>-- Select a match to score --</option>
-            {fixtures.map((f, i) => (
-              <option key={f.Id || `${f["Match Name"]}-${i}`} value={f.Id || f["Match Name"]}>
-                {f.Category ? `[${f.Category}] ` : ''}{f["Match Name"]} — {f["Team A"]} vs {f["Team B"]} ({f.Status || 'Scheduled'})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      {/* Select Match from Google Sheet Fixtures Dropdown (Upcoming / Active matches only) */}
+      {(() => {
+        const upcomingFixtures = fixtures.filter(f => {
+          const st = String(f.Status || "").trim().toUpperCase();
+          return st !== "COMPLETE" && st !== "COMPLETED" && st !== "DONE";
+        });
+
+        if (upcomingFixtures.length === 0) return null;
+
+        return (
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <span className="text-xs font-black uppercase tracking-widest text-amber-400 shrink-0">
+              🎯 Load Match from Sheet:
+            </span>
+            <select
+              onChange={(e) => {
+                const selected = fixtures.find(f => (f.Id || f["Match Name"]) === e.target.value);
+                if (selected) {
+                  const label = selected.Category ? `${selected.Category} · ${selected["Match Name"]}` : selected["Match Name"];
+                  updateLiveState({
+                    matchName: label,
+                    teamA: selected["Team A"] || "Team A",
+                    teamB: selected["Team B"] || "Team B",
+                    scoreA: 0,
+                    scoreB: 0,
+                    currentSet: 1,
+                    setHistory: [],
+                    winner: undefined,
+                    status: 'Ongoing',
+                    displayMode: 'live'
+                  });
+                }
+              }}
+              defaultValue=""
+              className="w-full sm:w-auto bg-slate-950 text-amber-300 text-xs font-extrabold border border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-400 shadow-inner"
+            >
+              <option value="" disabled>-- Select an upcoming match to score ({upcomingFixtures.length} available) --</option>
+              {upcomingFixtures.map((f, i) => (
+                <option key={f.Id || `${f["Match Name"]}-${i}`} value={f.Id || f["Match Name"]}>
+                  {f.Category ? `[${f.Category}] ` : ''}{f["Match Name"]} — {f["Team A"]} vs {f["Team B"]} ({f.Status || 'Scheduled'})
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      })()}
 
       {/* TV Display Mode Controls */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
