@@ -5,11 +5,14 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { LiveScoreState, ActionCategory, checkBadmintonSetWinner, getBadmintonBadge } from "@/types/scorecard";
 import { subscribeToLiveState, updateLiveState, fetchOngoingMatchFromSheets } from "@/services/live-scoreboard";
+import { getBadmintonFixtures } from "@/services/google-sheets";
+import { BadmintonFixture } from "@/types/festival";
 import { Lock, CheckCircle2, RefreshCw, RotateCcw, Zap, ArrowLeft, Plus, Minus, UserCheck, Trophy, Sparkles, Monitor, Tv } from "lucide-react";
 import Link from "next/link";
 
 export default function ScoreSetterAdminPage() {
   const [state, setState] = useState<LiveScoreState | null>(null);
+  const [fixtures, setFixtures] = useState<BadmintonFixture[]>([]);
   const [pinInput, setPinInput] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [pinError, setPinError] = useState(false);
@@ -19,6 +22,9 @@ export default function ScoreSetterAdminPage() {
     const unsubscribe = subscribeToLiveState((newState) => {
       setState(newState);
     });
+
+    // Fetch fixtures for match selector dropdown
+    getBadmintonFixtures().then(setFixtures).catch(console.error);
 
     // Auto-sync Ongoing match from Google Sheets on mount
     fetchOngoingMatchFromSheets().then(sheetData => {
@@ -253,6 +259,44 @@ export default function ScoreSetterAdminPage() {
           </Link>
         </div>
       </header>
+
+      {/* Select Match from Google Sheet Fixtures Dropdown */}
+      {fixtures.length > 0 && (
+        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <span className="text-xs font-black uppercase tracking-widest text-amber-400 shrink-0">
+            🎯 Load Match from Sheet:
+          </span>
+          <select
+            onChange={(e) => {
+              const selected = fixtures.find(f => (f.Id || f["Match Name"]) === e.target.value);
+              if (selected) {
+                const label = selected.Category ? `${selected.Category} · ${selected["Match Name"]}` : selected["Match Name"];
+                updateLiveState({
+                  matchName: label,
+                  teamA: selected["Team A"] || "Team A",
+                  teamB: selected["Team B"] || "Team B",
+                  scoreA: 0,
+                  scoreB: 0,
+                  currentSet: 1,
+                  setHistory: [],
+                  winner: undefined,
+                  status: 'Ongoing',
+                  displayMode: 'live'
+                });
+              }
+            }}
+            defaultValue=""
+            className="w-full sm:w-auto bg-slate-950 text-amber-300 text-xs font-extrabold border border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-400 shadow-inner"
+          >
+            <option value="" disabled>-- Select a match to score --</option>
+            {fixtures.map((f, i) => (
+              <option key={f.Id || `${f["Match Name"]}-${i}`} value={f.Id || f["Match Name"]}>
+                {f.Category ? `[${f.Category}] ` : ''}{f["Match Name"]} — {f["Team A"]} vs {f["Team B"]} ({f.Status || 'Scheduled'})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* TV Display Mode Controls */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">

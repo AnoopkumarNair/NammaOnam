@@ -44,6 +44,7 @@ export interface WalkathonEntry {
 }
 
 export interface BadmintonFixture {
+  Id?: string;
   "Match Name": string;
   Date: string;
   Status: string;

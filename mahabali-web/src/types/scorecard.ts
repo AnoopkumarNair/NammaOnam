@@ -45,9 +45,9 @@ export interface LiveScoreState {
 }
 
 export const DEFAULT_LIVE_STATE: LiveScoreState = {
-  matchName: "Quarter Final 1",
-  teamA: "Block A Strikers",
-  teamB: "Block C Smashers",
+  matchName: "Men's Doubles · Semi Finals 1",
+  teamA: "Santhosh & Vasu",
+  teamB: "Bhanu & Rohit",
   scoreA: 0,
   scoreB: 0,
   currentSet: 1,
