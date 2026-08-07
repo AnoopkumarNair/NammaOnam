@@ -233,7 +233,7 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
 
         {(() => {
           const isBadminton = activity.Title?.toLowerCase().includes("badminton");
-          const targetUrl = isBadminton ? "#badminton-fixtures" : registrationUrl;
+          const targetUrl = isBadminton ? "#badminton" : registrationUrl;
           const displayLabel = isBadminton ? "Show Fixtures 🏸" : buttonLabel;
 
           if (buttonLabel.toUpperCase() === "NONE") return null;
