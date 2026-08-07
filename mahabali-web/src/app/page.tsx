@@ -229,26 +229,36 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
           </div>
         )}
 
-        {buttonLabel.toUpperCase() !== "NONE" && (
-          registrationUrl ? (
-            <a
-              href={registrationUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-auto h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200"
-              style={{ background: "var(--gradient-gold)", color: "#1E0F08" }}
-            >
-              {buttonLabel}
-            </a>
-          ) : (
+        {(() => {
+          const isBadminton = activity.Title?.toLowerCase().includes("badminton");
+          const targetUrl = isBadminton ? "#badminton-fixtures" : registrationUrl;
+          const displayLabel = isBadminton ? "Show Fixtures 🏸" : buttonLabel;
+
+          if (buttonLabel.toUpperCase() === "NONE") return null;
+
+          if (targetUrl) {
+            return (
+              <a
+                href={targetUrl}
+                target={isBadminton ? "_self" : "_blank"}
+                rel={isBadminton ? undefined : "noreferrer"}
+                className="mt-auto h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 shadow-md hover:scale-[1.02]"
+                style={{ background: isBadminton ? "linear-[#D4AF37], #D4AF37" : "var(--gradient-gold)", color: "#1E0F08", backgroundColor: "#D4AF37" }}
+              >
+                {displayLabel}
+              </a>
+            );
+          }
+
+          return (
             <div
               className="mt-auto h-11 rounded-full flex items-center justify-center text-sm font-bold"
               style={{ background: "rgba(74,46,31,0.07)", color: "rgba(74,46,31,0.5)" }}
             >
               Details soon
             </div>
-          )
-        )}
+          );
+        })()}
       </div>
     </article>
   );
