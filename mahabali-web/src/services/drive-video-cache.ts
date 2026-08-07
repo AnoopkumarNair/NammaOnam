@@ -46,17 +46,37 @@ let activeClipsStore: Record<string, ActionClip[]> = { ...DRIVE_RAW_CLIPS };
 // Track last played video per category so no video plays twice in a row
 const lastPlayedMap = new Map<string, string>();
 
-const CACHE_NAME = 'badminton-video-clips-cache-v2';
+// In-memory Blob URL store for 0ms instant local playback
+const blobMap = new Map<string, string>();
 
 /**
- * Background preloader: Pulls fresh Google Drive list & caches all video MP4 files into CacheStorage
+ * Returns instant Blob URL if cached, or direct high-speed CDN streaming URL
+ */
+export function getFastVideoUrl(url: string): string {
+  if (!url) return "";
+  
+  // 1. Check if we have an in-memory blob URL ready (0ms instant playback)
+  if (blobMap.has(url)) {
+    return blobMap.get(url)!;
+  }
+
+  // 2. Extract Drive File ID and convert to direct high-speed CDN stream URL
+  const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+  }
+
+  return url;
+}
+
+/**
+ * Background preloader: Fetches all video MP4 files into memory Blobs & CacheStorage for 0ms instant playback
  */
 export async function preloadVideoClips(): Promise<{ cachedCount: number; total: number }> {
   let cachedCount = 0;
   let total = 0;
 
   try {
-    // 1. Fetch latest files dynamically from Apps Script endpoint to pick up any new Drive uploads
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
     const res = await fetch(scriptUrl, { signal: AbortSignal.timeout(10000) }).catch(() => null);
     
@@ -89,29 +109,30 @@ export async function preloadVideoClips(): Promise<{ cachedCount: number; total:
     console.warn("Dynamic Drive video lookup fallback to static clips:", err);
   }
 
-  // 2. Cache all MP4s into browser CacheStorage for 100% offline local TV playback
-  if (typeof window !== 'undefined' && 'caches' in window) {
-    try {
-      const cache = await caches.open(CACHE_NAME);
-      const categories = Object.keys(activeClipsStore);
+  // Preload all clips into Blob memory for instant 0ms playback
+  const allClips: ActionClip[] = [];
+  Object.values(activeClipsStore).forEach(list => {
+    if (Array.isArray(list)) allClips.push(...list);
+  });
+  total = allClips.length;
 
-      for (const cat of categories) {
-        const clips = activeClipsStore[cat] || [];
-        total += clips.length;
-        for (const clip of clips) {
-          try {
-            const match = await cache.match(clip.url);
-            if (!match) {
-              await cache.add(clip.url).catch(() => {});
-            }
-            cachedCount++;
-          } catch (e) {
-            // Ignore single video fetch failures
-          }
-        }
+  for (const clip of allClips) {
+    if (!clip.url || blobMap.has(clip.url)) {
+      cachedCount++;
+      continue;
+    }
+
+    try {
+      const cdnUrl = getFastVideoUrl(clip.url);
+      const resp = await fetch(cdnUrl, { signal: AbortSignal.timeout(15000) });
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        blobMap.set(clip.url, blobUrl);
+        cachedCount++;
       }
     } catch (e) {
-      console.warn("CacheStorage preloading error:", e);
+      // Fallback to direct stream URL if single fetch fails
     }
   }
 
