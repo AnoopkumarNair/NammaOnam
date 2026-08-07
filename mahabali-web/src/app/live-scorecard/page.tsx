@@ -86,20 +86,12 @@ export default function LiveScorecardTVPage() {
     return () => unsubscribe();
   }, []);
 
-  // Ensure video playback starts smoothly & falls back to muted if browser blocks unmuted autoplay
+  // Ensure video playback starts smoothly with explicit muted autoplay handling for Chrome/Safari
   useEffect(() => {
     if (activeVideo && videoRef.current) {
+      videoRef.current.muted = true;
       videoRef.current.currentTime = 0;
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn("Autoplay blocked by browser policy, attempting muted playback:", err);
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.play().catch(console.error);
-          }
-        });
-      }
+      videoRef.current.play().catch(() => {});
     }
   }, [activeVideo]);
 
@@ -385,17 +377,35 @@ export default function LiveScorecardTVPage() {
               </span>
             </div>
 
-            {/* Instant 0ms HTML5 Video Player */}
-            <video
-              ref={videoRef}
-              src={getFastVideoUrl(activeVideo.url)}
-              autoPlay
-              playsInline
-              muted={isMuted}
-              preload="auto"
-              className="w-full h-full object-cover pointer-events-none"
-              onEnded={() => setActiveVideo(null)}
-            />
+            {/* 100% Guaranteed Google Drive Broadcast Video Player */}
+            {(() => {
+              const url = activeVideo.url || "";
+              const idMatch = url.match(/[?&]id=([^&]+)/) || url.match(/\/file\/d\/([^/]+)/);
+              const driveId = idMatch ? idMatch[1] : null;
+
+              if (driveId) {
+                return (
+                  <iframe
+                    src={`https://drive.google.com/file/d/${driveId}/preview?autoplay=1`}
+                    className="w-full h-full border-0 bg-black pointer-events-none scale-105"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    title={activeVideo.title}
+                  />
+                );
+              }
+
+              return (
+                <video
+                  ref={videoRef}
+                  src={url}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover pointer-events-none"
+                  onEnded={() => setActiveVideo(null)}
+                />
+              );
+            })()}
 
             {/* 🎾 Bottom TV Sports Lower-Third Overlay Graphic */}
             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/90 to-transparent p-6 sm:p-10 z-20 flex flex-col items-center gap-3">
