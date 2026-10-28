@@ -9,8 +9,9 @@ import { getBadmintonFixtures } from "@/services/google-sheets";
 import { BadmintonFixture } from "@/types/festival";
 import { Lock, CheckCircle2, RefreshCw, RotateCcw, Zap, ArrowLeft, Plus, Minus, UserCheck, Trophy, Sparkles, Monitor, Tv } from "lucide-react";
 import Link from "next/link";
+import { ARCHIVED, ARCHIVE_HEADLINE, ARCHIVE_THANKS } from "@/lib/archive";
 
-export default function ScoreSetterAdminPage() {
+function ScoreSetterAdminPage() {
   const [state, setState] = useState<LiveScoreState | null>(null);
   const [fixtures, setFixtures] = useState<BadmintonFixture[]>([]);
   const [pinInput, setPinInput] = useState("");
@@ -510,4 +511,19 @@ export default function ScoreSetterAdminPage() {
       </div>
     </div>
   );
+}
+
+function FestivalConcluded() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center" style={{ background: "#1E0F08", color: "#F8F3E7" }}>
+      <span className="text-5xl">🌼</span>
+      <h1 className="text-2xl md:text-4xl font-bold">{ARCHIVE_HEADLINE}</h1>
+      <p className="opacity-80 max-w-md">Live scoring has closed. {ARCHIVE_THANKS}</p>
+      <Link href="/" className="mt-4 px-6 py-3 rounded-full font-semibold" style={{ background: "#D4AF37", color: "#1E0F08" }}>Back to the festival site</Link>
+    </main>
+  );
+}
+
+export default function Page() {
+  return ARCHIVED ? <FestivalConcluded /> : <ScoreSetterAdminPage />;
 }

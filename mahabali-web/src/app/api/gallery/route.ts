@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import { ARCHIVED } from "@/lib/archive";
 
 export async function GET() {
+  if (ARCHIVED) {
+    // Festival photos are not served publicly once the event is archived.
+    return NextResponse.json({ files: [] }, { status: 410 });
+  }
   try {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbyHWq-VhpMpP8XuS_z1GsAm1jJlfgOyWN2MHLd2ajy4kroiVo6ffLOvHwsovACJCK3N/exec";
 

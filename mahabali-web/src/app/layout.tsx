@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ARCHIVED } from "@/lib/archive";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,7 +17,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "GR Sitara Onam Festival",
-  description: "Join us for a grand Onam celebration at GR Sitara.",
+  description: ARCHIVED
+    ? "Namma Onam 2.0, the GR Sitara Onam celebration held on 15 & 16 August 2026."
+    : "Join us for a grand Onam celebration at GR Sitara.",
+  // A residents' community site: keep it out of search results once archived.
+  robots: ARCHIVED ? { index: false, follow: false } : undefined,
   keywords: ["Onam", "Festival", "GR Sitara", "Kerala", "Sadhya"],
   authors: [{ name: "Project Mahabali" }],
   manifest: "/manifest.json",

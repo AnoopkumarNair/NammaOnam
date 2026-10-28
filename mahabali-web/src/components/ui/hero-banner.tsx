@@ -9,6 +9,7 @@ interface HeroBannerProps {
   targetDate: string;
   eventDateLabel?: string;
   registrationHref?: string;
+  archived?: boolean;
 }
 
 const PETALS = [
@@ -84,6 +85,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 }
 
 import Image from "next/image";
+import { ARCHIVE_HEADLINE, ARCHIVE_THANKS } from "@/lib/archive";
 
 export function HeroBanner({
   title,
@@ -91,6 +93,7 @@ export function HeroBanner({
   targetDate,
   eventDateLabel = "August 15 & 16, 2026",
   registrationHref = "#activities",
+  archived = false,
 }: HeroBannerProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -220,7 +223,20 @@ export function HeroBanner({
           transition={{ duration: 1, delay: 1 }}
           className="flex justify-center gap-2.5 md:gap-6 mt-8 md:mt-12"
         >
-          {isFestivalPast ? (
+          {archived ? (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-4xl md:text-6xl">🌼</span>
+              <span
+                className="text-lg md:text-2xl font-black tracking-wide text-center"
+                style={{ color: "#FFD700", textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
+              >
+                {ARCHIVE_HEADLINE}
+              </span>
+              <span className="text-sm md:text-base text-center" style={{ color: "#F8F3E7", textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>
+                {ARCHIVE_THANKS}
+              </span>
+            </div>
+          ) : isFestivalPast ? (
             <div className="flex flex-col items-center gap-2">
               <span className="text-4xl md:text-6xl">🎉</span>
               <span
@@ -259,7 +275,7 @@ export function HeroBanner({
           >
             Explore Festival
           </motion.a>
-          <motion.a
+          {!archived && (<motion.a
             href={registrationHref}
             target={registrationHref.startsWith("http") ? "_blank" : undefined}
             rel={registrationHref.startsWith("http") ? "noreferrer" : undefined}
@@ -275,7 +291,7 @@ export function HeroBanner({
             }}
           >
             Register Now
-          </motion.a>
+          </motion.a>)}
         </motion.div>
       </motion.div>
 

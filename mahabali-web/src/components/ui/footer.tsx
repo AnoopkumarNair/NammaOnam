@@ -7,9 +7,10 @@ import type { CommitteeMember } from "@/types/festival";
 interface FooterProps {
   committee?: CommitteeMember[];
   config?: Record<string, unknown>;
+  archived?: boolean;
 }
 
-export function Footer({ committee, config = {} }: FooterProps) {
+export function Footer({ committee, config = {}, archived = false }: FooterProps) {
   const currentYear = new Date().getFullYear();
   
   const helpEmail = typeof config["Help Email"] === "string" ? config["Help Email"].trim() : "onam@grsitara.in";
@@ -40,14 +41,23 @@ export function Footer({ committee, config = {} }: FooterProps) {
           <ul className="space-y-2 text-sm opacity-80">
             <li><a href="#" className="hover:text-yellow-300 transition-colors">Home</a></li>
             <li><a href="#activities" className="hover:text-yellow-300 transition-colors">Activities & Events</a></li>
-            <li><a href="#walkathon" className="hover:text-yellow-300 transition-colors">Walkathon Leaderboard</a></li>
-            <li><a href="#badminton" className="hover:text-yellow-300 transition-colors">Badminton Tournament</a></li>
-            <li><a href="#gallery" className="hover:text-yellow-300 transition-colors">Memories Gallery</a></li>
+            {archived ? (
+              <>
+                <li><a href="#stalls" className="hover:text-yellow-300 transition-colors">Festival Stalls</a></li>
+                <li><a href="#faq" className="hover:text-yellow-300 transition-colors">Common Questions</a></li>
+              </>
+            ) : (
+              <>
+                <li><a href="#walkathon" className="hover:text-yellow-300 transition-colors">Walkathon Leaderboard</a></li>
+                <li><a href="#badminton" className="hover:text-yellow-300 transition-colors">Badminton Tournament</a></li>
+                <li><a href="#gallery" className="hover:text-yellow-300 transition-colors">Memories Gallery</a></li>
+              </>
+            )}
           </ul>
         </div>
 
         {/* Committee & Coordinators */}
-        <div>
+        {!archived && (<div>
           <h4 className="text-lg font-semibold mb-4 text-yellow-200">Organizing Committee</h4>
           <ul className="space-y-2 text-sm opacity-80">
             {committee && committee.length > 0 ? (
@@ -65,17 +75,17 @@ export function Footer({ committee, config = {} }: FooterProps) {
               </>
             )}
           </ul>
-        </div>
+        </div>)}
 
         {/* Contacts & Support */}
         <div>
           <h4 className="text-lg font-semibold mb-4 text-yellow-200">Need Help?</h4>
           <p className="text-sm opacity-80 mb-2">
-            Reach out to the helpdesk for event registrations or sponsorship queries.
+            {archived ? "Questions about the festival? Write to the residents' association." : "Reach out to the helpdesk for event registrations or sponsorship queries."}
           </p>
           <div className="text-sm space-y-1">
             <p>📧 <span className="opacity-90">{helpEmail}</span></p>
-            <p>📞 <span className="opacity-90">{helpPhone}</span></p>
+            {!archived && <p>📞 <span className="opacity-90">{helpPhone}</span></p>}
             <p>📍 <span className="opacity-90">{helpLocation}</span></p>
           </div>
         </div>
@@ -88,7 +98,7 @@ export function Footer({ committee, config = {} }: FooterProps) {
         </div>
         <div className="flex gap-4 items-center">
           <span>Handcrafted with 💛 for Onam</span>
-          <a 
+          {!archived && (<a 
             href="https://vercel.com/manavalanz/namma-onam/analytics" 
             target="_blank" 
             rel="noopener noreferrer" 
@@ -96,7 +106,7 @@ export function Footer({ committee, config = {} }: FooterProps) {
             title="View Analytics Dashboard"
           >
             📊
-          </a>
+          </a>)}
         </div>
       </div>
     </footer>
