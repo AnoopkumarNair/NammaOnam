@@ -34,6 +34,7 @@ import {
 } from "@/services/google-sheets";
 import { getDriveAssetsMap } from "@/services/drive-assets";
 import type { Activity, Sponsor, Stall } from "@/types/festival";
+import { ARCHIVED, scrubPhones } from "@/lib/archive";
 
 const REGISTRATION_KEYS = [
   "Registration URL",
@@ -114,6 +115,7 @@ function StatusBadge({ status }: { status: string }) {
     Upcoming: { bg: "rgba(212,175,55,0.15)", text: "#7a5c00", dot: "#D4AF37" },
     Closed: { bg: "rgba(74,46,31,0.08)", text: "#7a5c46", dot: "#9e7c5c" },
     Live: { bg: "rgba(180,30,30,0.12)", text: "#8b1a1a", dot: "#c0392b" },
+    Concluded: { bg: "rgba(74,46,31,0.08)", text: "#7a5c46", dot: "#9e7c5c" },
   };
   const normalizedStatus = status?.trim() || "Upcoming";
   const color = colors[normalizedStatus] ?? colors.Upcoming;
@@ -178,7 +180,7 @@ function FestivalReels() {
   );
 }
 
-function ActivityCard({ activity, index }: { activity: Activity; index: number }) {
+function ActivityCard({ activity, index, archived = false }: { activity: Activity; index: number; archived?: boolean }) {
   const registrationUrl = getRegistrationUrl(activity as unknown as Record<string, unknown>);
   const sheetImage = typeof activity["Image URL"] === "string" ? activity["Image URL"].trim() : "";
   const mediaRaw = sheetImage || getActivityMedia(activity, index);
@@ -199,7 +201,9 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
       )}
       <div className="p-5 flex flex-col gap-4 flex-1">
         <div className="flex items-start justify-between gap-3">
-          {buttonLabel.toUpperCase() !== "NONE" ? (
+          {archived ? (
+            <StatusBadge status="Concluded" />
+          ) : buttonLabel.toUpperCase() !== "NONE" ? (
             <StatusBadge status={activity.Status} />
           ) : (
             <div /> 
@@ -216,7 +220,7 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
             {activity.Title}
           </h3>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "rgba(74,46,31,0.72)" }}>
-            {activity.Description}
+            {archived ? scrubPhones(activity.Description) : activity.Description}
           </p>
         </div>
 
@@ -236,7 +240,7 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
           const targetUrl = isBadminton ? "#badminton" : registrationUrl;
           const displayLabel = isBadminton ? "Show Fixtures 🏸" : buttonLabel;
 
-          if (buttonLabel.toUpperCase() === "NONE") return null;
+          if (archived || buttonLabel.toUpperCase() === "NONE") return null;
 
           if (targetUrl) {
             return (
@@ -276,15 +280,21 @@ export default async function Home() {
   const [config, activities, fixtures, sponsors, stalls, announcements, committee, culturals, faqs, driveAssetsMap] = await Promise.all([
     getConfig(),
     getActivities(),
-    getBadmintonFixtures(),
+    // In archive mode, skip the tabs that name or contact residents.
+    ARCHIVED ? Promise.resolve([]) : getBadmintonFixtures(),
     getSponsors(),
     getStalls(),
-    getAnnouncements(),
-    getCommittee(),
-    getCulturalEvents(),
+    ARCHIVED ? Promise.resolve([]) : getAnnouncements(),
+    ARCHIVED ? Promise.resolve([]) : getCommittee(),
+    ARCHIVED ? Promise.resolve([]) : getCulturalEvents(),
     getFaqs(),
-    getDriveAssetsMap(),
+    ARCHIVED ? Promise.resolve(new Map<string, string>()) : getDriveAssetsMap(),
   ]);
+  const safeStalls = ARCHIVED ? stalls.map((s) => ({ ...s, Description: scrubPhones(s.Description) })) : stalls;
+  // Registration FAQs no longer apply once the festival is over.
+  const safeFaqs = ARCHIVED
+    ? faqs.filter((f) => !/regist/i.test(`${f.Question} ${f.Answer}`)).map((f) => ({ ...f, Answer: scrubPhones(f.Answer) }))
+    : faqs;
 
   const title = getText(config["Festival Name"]) || "Namma Onam 2.0";
   // Festival date is Aug 15 2026. The sheet has a known typo (09-15 vs 08-15), so we use the correct date directly.
@@ -302,9 +312,9 @@ export default async function Home() {
     <PageTransition className="flex flex-col min-h-screen">
       {config["Intro Enabled"] !== false && <IntroScreen />}
 
-      <NavigationBar brandTitle={title} registrationHref={registrationHref} />
+      <NavigationBar brandTitle={title} registrationHref={registrationHref} archived={ARCHIVED} />
 
-      {announcements.length > 0 && (
+      {!ARCHIVED && announcements.length > 0 && (
         <div
           className="fixed top-[68px] md:top-[76px] z-[55] w-full py-2 overflow-hidden pointer-events-none"
           style={{
@@ -330,6 +340,7 @@ export default async function Home() {
           targetDate={targetDate}
           eventDateLabel={eventDateLabel}
           registrationHref={registrationHref}
+          archived={ARCHIVED}
         />
 
         <SponsorsMarquee sponsors={sponsors} />
@@ -339,7 +350,7 @@ export default async function Home() {
             {activities.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {activities.map((activity, index) => (
-                  <ActivityCard key={`${activity.Id}-${activity.Title}`} activity={activity} index={index} />
+                  <ActivityCard key={`${activity.Id}-${activity.Title}`} activity={activity} index={index} archived={ARCHIVED} />
                 ))}
               </div>
             ) : (
@@ -349,13 +360,13 @@ export default async function Home() {
             )}
           </StackedSection>
 
-          {stalls.length > 0 && (
+          {safeStalls.length > 0 && (
             <StackedSection id="stalls" title="Festival Stalls" index={2}>
-              <StallsCarousel stalls={stalls} />
+              <StallsCarousel stalls={safeStalls} />
             </StackedSection>
           )}
 
-          {(config["Enable Walkathon"] === true || config["Enable Walkathon"] === "TRUE") && (
+          {!ARCHIVED && (config["Enable Walkathon"] === true || config["Enable Walkathon"] === "TRUE") && (
             <StackedSection id="walkathon" title="Walkathon Leaderboard" index={3}>
               <Suspense fallback={<div className="w-full max-w-4xl mx-auto p-8 rounded-2xl bg-white shadow-sm border border-orange-100 flex items-center justify-center min-h-[300px]"><div className="animate-pulse flex flex-col items-center gap-4"><div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin"></div><p className="text-orange-800 font-medium">Fetching Live Leaderboard...</p></div></div>}>
                 <WalkathonSection registrationUrl={walkathonRegistrationUrl} />
@@ -363,29 +374,33 @@ export default async function Home() {
             </StackedSection>
           )}
 
-          {(config["Enable Badminton"] === true || config["Enable Badminton"] === "TRUE") && (
+          {!ARCHIVED && (config["Enable Badminton"] === true || config["Enable Badminton"] === "TRUE") && (
             <StackedSection id="badminton" title="Badminton Tournament" index={4}>
               <BadmintonBracket fixtures={fixtures} rulesUrl={rulesPdfUrl} />
             </StackedSection>
           )}
 
-          <StackedSection id="schedule" title="Festival Schedule" index={5}>
-            <CulturalTimeline events={culturals} />
-          </StackedSection>
+          {!ARCHIVED && (
+            <StackedSection id="schedule" title="Festival Schedule" index={5}>
+              <CulturalTimeline events={culturals} />
+            </StackedSection>
+          )}
 
-          {(config["Enable Gallery"] === true || config["Enable Gallery"] === "TRUE") && (
+          {!ARCHIVED && (config["Enable Gallery"] === true || config["Enable Gallery"] === "TRUE") && (
             <StackedSection id="gallery" title="Memories Gallery" index={6}>
               <Gallery />
             </StackedSection>
           )}
 
           <StackedSection id="faq" title="Common Questions" index={7}>
-            <FaqAccordion faqs={faqs} />
+            <FaqAccordion faqs={safeFaqs} />
           </StackedSection>
 
-          <StackedSection id="committee" title="Organizing Committee" index={8}>
-            <CommitteeGrid members={committee} />
-          </StackedSection>
+          {!ARCHIVED && (
+            <StackedSection id="committee" title="Organizing Committee" index={8}>
+              <CommitteeGrid members={committee} />
+            </StackedSection>
+          )}
         </div>
       </main>
 
@@ -393,7 +408,7 @@ export default async function Home() {
       <MaveliWidget initialMessage={`Welcome to ${title}.`} />
       
       {/* 🏸 Mobile Floating Quick Links FAB */}
-      <div className="fixed bottom-5 right-5 z-40 md:hidden">
+      {!ARCHIVED && (<div className="fixed bottom-5 right-5 z-40 md:hidden">
         <Link
           href="/live-scorecard"
           target="_blank"
@@ -402,9 +417,9 @@ export default async function Home() {
           <Trophy className="w-4 h-4 fill-slate-950" />
           <span>Live Scores ↗</span>
         </Link>
-      </div>
+      </div>)}
 
-      <Footer committee={committee} config={config} />
+      <Footer committee={committee} config={config} archived={ARCHIVED} />
     </PageTransition>
   );
 }

@@ -18,12 +18,18 @@ const NAV_LINKS = [
 interface NavigationBarProps {
   brandTitle?: string;
   registrationHref?: string;
+  archived?: boolean;
 }
+
+// Sections still shown once the festival is archived
+const ARCHIVE_LINKS = new Set(["Home", "Activities", "Stalls", "FAQ"]);
 
 export function NavigationBar({
   brandTitle = "Namma Onam 2.0",
   registrationHref = "#activities",
+  archived = false,
 }: NavigationBarProps) {
+  const links = archived ? NAV_LINKS.filter((l) => ARCHIVE_LINKS.has(l.label)) : NAV_LINKS;
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled]           = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -79,7 +85,7 @@ export function NavigationBar({
 
             {/* Desktop Links */}
             <div className="hidden lg:flex items-center gap-6">
-              {NAV_LINKS.map((link) => (
+              {links.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
@@ -96,7 +102,7 @@ export function NavigationBar({
               ))}
 
               {/* CTA pill */}
-              <a
+              {!archived && (<a
                 href={registrationHref}
                 target={registrationHref.startsWith("http") ? "_blank" : undefined}
                 rel={registrationHref.startsWith("http") ? "noreferrer" : undefined}
@@ -108,7 +114,7 @@ export function NavigationBar({
                 }}
               >
                 Register
-              </a>
+              </a>)}
             </div>
 
             {/* Mobile menu button */}
@@ -173,7 +179,7 @@ export function NavigationBar({
 
               {/* Links Area */}
               <div className="flex flex-col gap-0 flex-1 pr-2">
-                {NAV_LINKS.map((link, i) => (
+                {links.map((link, i) => (
                   <motion.a
                     key={link.label}
                     href={link.href}
@@ -193,7 +199,7 @@ export function NavigationBar({
               </div>
 
               {/* Sticky Footer Area */}
-              <div className="pt-4 shrink-0 mt-auto">
+              {!archived && (<div className="pt-4 shrink-0 mt-auto">
                 <a
                   href={registrationHref}
                   target={registrationHref.startsWith("http") ? "_blank" : undefined}
@@ -207,7 +213,7 @@ export function NavigationBar({
                 >
                   Register Now
                 </a>
-              </div>
+              </div>)}
             </motion.div>
           </>
         )}
